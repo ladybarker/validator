@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML5 Validator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Roboto, Arial, sans-serif;
+      background: #f5f5f5;
+      color: #212121;
+      min-height: 100vh;
+    }
+
+    /* ── Header ────────────────────────────────────────────────────────────── */
+    .header {
+      background: #1a7340;
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 4px rgba(0,0,0,.28);
+    }
+    .header-bar {
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      height: 56px;
+    }
+    .header-title {
+      font-size: 20px;
+      font-weight: 400;
+      letter-spacing: .01em;
+    }
+    .header-tabs { display: flex; padding: 0 8px; }
+    .tab {
+      padding: 0 16px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.7);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: color .15s, border-color .15s;
+      user-select: none;
+    }
+    .tab.active { color: #fff; border-bottom-color: #ffd600; }
+    .tab:hover  { color: #fff; background: rgba(255,255,255,.08); }
+
+    /* ── Upload page ─────────────────────────────────────────────────────── */
+    #uploadPage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 104px);
+      padding: 40px 16px;
+    }
+    .upload-card {
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+      padding: 48px 40px;
+      text-align: center;
+      width: 100%;
+      max-width: 480px;
+    }
+    .upload-card h2 { font-size: 22px; font-weight: 400; margin-bottom: 8px; }
+    .upload-card p  { font-size: 14px; color: #757575; margin-bottom: 28px; }
+    .drop-zone {
+      border: 2px dashed #bdbdbd;
+      border-radius: 4px;
+      padding: 36px 20px;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      margin-bottom: 20px;
+    }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: #1a7340; background: #f1f8f4; }
+    .drop-zone-sub { font-size: 13px; color: #9e9e9e; margin-top: 6px; }
+    .upload-btn {
+      display: inline-block;
+      padding: 10px 28px;
+      background: #1a7340;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      transition: background .15s;
+    }
+    .upload-btn:hover { background: #155c33; }
+    #fileInput { display: none; }
+
+    /* ── Shared page wrapper ─────────────────────────────────────────────── */
+    #assetPage, #landingPage {
+      display: none;
+      padding: 28px 16px 48px;
+    }
+
+    .validator-card, .lp-card {
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.18);
+      max-width: 680px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    /* Card header */
+    .card-header { padding: 20px 24px 16px; border-bottom: 1px solid #e0e0e0; }
+    .card-title    { font-size: 20px; font-weight: 400; }
+    .card-subtitle { font-size: 13px; color: #9e9e9e; margin-top: 3px; }
+
+    /* ── Preview controls ─────────────────────────────────────────────────── */
+    .preview-controls {
+      padding: 10px 16px;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ctrl-select {
+      border: 1px solid #e0e0e0;
+      border-radius: 2px;
+      padding: 5px 8px;
+      font-size: 13px;
+      background: #fff;
+      cursor: pointer;
+      min-width: 150px;
+    }
+    .ctrl-dim {
+      border: 1px solid #e0e0e0;
+      border-radius: 2px;
+      padding: 5px 6px;
+      font-size: 14px;
+      width: 58px;
+      text-align: center;
+    }
+    .ctrl-dim:focus { outline: none; border-color: #1a7340; }
+    .dim-x { font-size: 16px; color: #9e9e9e; }
+    .ctrl-spacer { flex: 1; }
+    .ctrl-icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #757575;
+      padding: 4px;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+    }
+    .ctrl-icon-btn:hover { background: #f5f5f5; color: #212121; }
+
+    /* ── Preview pane ─────────────────────────────────────────────────────── */
+    .preview-pane {
+      background: #fafafa;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .preview-wrap {
+      border: 1px solid #e0e0e0;
+      background: #fff;
+      overflow: hidden;
+      position: relative;
+    }
+    .preview-wrap iframe { display: block; border: none; }
+    .preview-loading {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 13px;
+      color: #757575;
+    }
+
+    /* Click info bar */
+    .click-info-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #e3f2fd;
+      border-radius: 2px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #0d47a1;
+      width: 100%;
+      max-width: 640px;
+    }
+
+    /* Click URL popup */
+    .click-popup-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.4);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .click-popup-overlay.show { display: flex; }
+    .click-popup {
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.3);
+      padding: 24px;
+      max-width: 480px;
+      width: 90%;
+    }
+    .click-popup-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: #212121;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .click-popup-title svg { color: #34a853; flex-shrink: 0; }
+    .click-popup-label { font-size: 12px; color: #757575; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .06em; }
+    .click-popup-url {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 13px;
+      color: #1a73e8;
+      background: #f5f5f5;
+      border-radius: 2px;
+      padding: 10px 12px;
+      word-break: break-all;
+      margin-bottom: 8px;
+    }
+    .click-popup-url.empty { color: #9e9e9e; font-style: italic; font-family: Roboto, sans-serif; }
+    .click-popup-note { font-size: 12px; color: #757575; margin-bottom: 20px; }
+    .click-popup-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .popup-btn {
+      background: none;
+      border: none;
+      color: #1a73e8;
+      font-size: 14px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 4px;
+    }
+    .popup-btn:hover { background: #e8f0fe; }
+    .popup-btn.primary { background: #1a73e8; color: #fff; }
+    .popup-btn.primary:hover { background: #1558b0; }
+
+    /* ── Landing pages row ────────────────────────────────────────────────── */
+    .landing-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 24px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .landing-icon {
+      width: 32px; height: 32px;
+      background: #fdd835;
+      border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .landing-text { flex: 1; }
+    .landing-title { font-size: 14px; font-weight: 500; }
+    .landing-sub   { font-size: 12px; color: #757575; margin-top: 2px; }
+    .text-btn {
+      background: none;
+      border: none;
+      color: #1a73e8;
+      font-size: 13px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 2px;
+    }
+    .text-btn:hover { background: #e8f0fe; }
+
+    /* ── Checks grid ──────────────────────────────────────────────────────── */
+    .checks-outer { border-bottom: 1px solid #e0e0e0; }
+
+    .checks-row {
+      display: flex;
+      align-items: stretch;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .checks-row:last-child { border-bottom: none; }
+
+    .check-item {
+      flex: 1;
+      min-width: 0;
+    }
+    .check-item + .check-item { border-left: 1px solid #f0f0f0; }
+    .check-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 16px;
+      cursor: pointer;
+      transition: background .1s;
+      user-select: none;
+    }
+    .check-header:hover { background: #fafafa; }
+    .check-name {
+      flex: 1;
+      font-size: 13.5px;
+      color: #212121;
+    }
+    .check-caret {
+      color: #9e9e9e;
+      flex-shrink: 0;
+      transition: transform .2s;
+    }
+    .check-item.open .check-caret { transform: rotate(180deg); }
+    .check-detail {
+      display: none;
+      padding: 2px 16px 12px 46px;
+      font-size: 12.5px;
+      color: #616161;
+      line-height: 1.55;
+    }
+    .check-item.open .check-detail { display: block; }
+    .check-detail code {
+      background: #f5f5f5;
+      border-radius: 2px;
+      padding: 1px 5px;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 12px;
+      color: #c62828;
+    }
+    .file-list { margin-top: 5px; display: flex; flex-wrap: wrap; gap: 4px; }
+    .file-chip {
+      background: #f5f5f5;
+      border-radius: 2px;
+      padding: 1px 6px;
+      font-size: 11.5px;
+      font-family: monospace;
+    }
+    .more-details {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid #eeeeee;
+    }
+    .more-details-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #424242;
+      margin-bottom: 5px;
+    }
+    .detail-line {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 11.5px;
+      color: #c62828;
+      line-height: 1.7;
+      display: block;
+    }
+    .icon-pass { color: #34a853; }
+    .icon-fail { color: #ea4335; }
+
+    /* ── Card actions ─────────────────────────────────────────────────────── */
+    .card-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 4px;
+      padding: 12px 16px;
+    }
+    .card-action-btn {
+      background: none;
+      border: none;
+      color: #1a73e8;
+      font-size: 14px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      cursor: pointer;
+      padding: 10px 16px;
+      border-radius: 4px;
+      transition: background .15s;
+    }
+    .card-action-btn:hover { background: #e8f0fe; }
+
+    /* ── Landing page tab ─────────────────────────────────────────────────── */
+    .lp-header { padding: 20px 24px 16px; border-bottom: 1px solid #e0e0e0; }
+    .lp-header h2 { font-size: 20px; font-weight: 400; }
+    .lp-header p  { font-size: 13px; color: #757575; margin-top: 4px; }
+    .lp-empty { padding: 40px 24px; text-align: center; color: #9e9e9e; font-size: 14px; }
+    .lp-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 24px;
+      border-bottom: 1px solid #f5f5f5;
+      font-size: 13px;
+    }
+    .lp-name { font-weight: 500; color: #212121; min-width: 90px; flex-shrink: 0; }
+    .lp-url  { flex: 1; word-break: break-all; font-family: monospace; font-size: 12px; color: #1a73e8; }
+    .lp-url.empty { color: #9e9e9e; font-style: italic; font-family: Roboto, sans-serif; }
+
+    /* ── Spinner ──────────────────────────────────────────────────────────── */
+    .spin {
+      width: 20px; height: 20px;
+      border: 2.5px solid #e0e0e0;
+      border-top-color: #1a7340;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header class="header">
+  <div class="header-bar">
+    <span class="header-title">HTML5 Validator</span>
+  </div>
+  <div class="header-tabs">
+    <div class="tab active" id="tabAsset"   onclick="switchTab('asset')">Asset</div>
+    <div class="tab"        id="tabLanding" onclick="switchTab('landing')">Landing Page</div>
+  </div>
+</header>
+
+<!-- ── Upload page ── -->
+<div id="uploadPage">
+  <div class="upload-card">
+    <h2>HTML5 Ad Validator</h2>
+    <p>Upload your HTML5 ad ZIP or ADZ file to validate it against Campaign Manager 360 requirements.</p>
+    <div class="drop-zone" id="dropZone"
+         ondragover="onDragOver(event)"
+         ondragleave="onDragLeave(event)"
+         ondrop="onDrop(event)"
+         onclick="document.getElementById('fileInput').click()">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="#9e9e9e" style="display:block;margin:0 auto 10px">
+        <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+      </svg>
+      <div style="font-size:15px;color:#424242">Drop your ZIP or ADZ file here</div>
+      <div class="drop-zone-sub">or click to browse</div>
+    </div>
+    <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Select File</button>
+    <input type="file" id="fileInput" accept=".zip,.adz" onchange="onFileSelect(event)">
+  </div>
+</div>
+
+<!-- ── Asset page ── -->
+<div id="assetPage">
+  <div class="validator-card">
+
+    <div class="card-header">
+      <div class="card-title">Asset Validation</div>
+      <div class="card-subtitle" id="cardSubtitle">—</div>
+    </div>
+
+    <!-- Preview controls -->
+    <div class="preview-controls">
+      <select class="ctrl-select" id="deviceSelect" onchange="onDeviceChange()">
+        <option value="">Select a Device</option>
+        <option value="300x250">Medium Rectangle — 300×250</option>
+        <option value="728x90">Leaderboard — 728×90</option>
+        <option value="160x600">Wide Skyscraper — 160×600</option>
+        <option value="300x600">Half Page — 300×600</option>
+        <option value="970x250">Billboard — 970×250</option>
+        <option value="320x50">Mobile Banner — 320×50</option>
+        <option value="320x480">Mobile Interstitial — 320×480</option>
+        <option value="336x280">Large Rectangle — 336×280</option>
+      </select>
+      <input class="ctrl-dim" id="dimW" type="number" min="1" value="300" onchange="onDimChange()">
+      <span class="dim-x">×</span>
+      <input class="ctrl-dim" id="dimH" type="number" min="1" value="250" onchange="onDimChange()">
+      <span class="ctrl-spacer"></span>
+      <button class="ctrl-icon-btn" title="Toggle preview" onclick="togglePreview()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+        </svg>
+      </button>
+      <select class="ctrl-select" id="scaleSelect" style="min-width:110px" onchange="onScaleChange()">
+        <option value="1">Previews</option>
+        <option value="1">Actual size</option>
+        <option value="0.75">75%</option>
+        <option value="0.5">50%</option>
+        <option value="0.25">25%</option>
+      </select>
+    </div>
+
+    <!-- Preview pane -->
+    <div class="preview-pane" id="previewPane">
+      <div class="preview-wrap" id="previewWrap">
+        <div class="preview-loading" id="previewLoading">
+          <div class="spin"></div>
+          <span>Building preview…</span>
+        </div>
+        <iframe id="previewFrame"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                scrolling="no"></iframe>
+      </div>
+
+      <div class="click-info-bar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+        </svg>
+        Click on the creative above to test click throughs. You'll see a confirmation dialog if implemented correctly.
+      </div>
+    </div>
+
+    <!-- Landing pages detected -->
+    <div class="landing-row" id="landingRow" style="display:none">
+      <div class="landing-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#5d4037">
+          <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        </svg>
+      </div>
+      <div class="landing-text">
+        <div class="landing-title">Landing pages were detected.</div>
+        <div class="landing-sub">Test your landing page URLs for compatibility with DoubleClick Bid Manager?</div>
+      </div>
+      <button class="text-btn" onclick="switchTab('landing')">Test</button>
+    </div>
+
+    <!-- Checks grid -->
+    <div class="checks-outer">
+      <div id="checksGrid"></div>
+    </div>
+
+    <!-- Actions -->
+    <div class="card-actions">
+      <button class="card-action-btn" onclick="startOver()">Start Over</button>
+      <button class="card-action-btn" onclick="shareResults()">Share</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Landing page tab ── -->
+<div id="landingPage">
+  <div class="lp-card">
+    <div class="lp-header">
+      <h2>Landing Page Validation</h2>
+      <p>Click tags detected in your creative. Verify that each URL resolves correctly before trafficking.</p>
+    </div>
+    <div id="lpContent">
+      <div class="lp-empty">Upload an asset on the Asset tab to see landing pages.</div>
+    </div>
+    <div class="card-actions">
+      <button class="card-action-btn" onclick="startOver()">Start Over</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Click-through popup ── -->
+<div class="click-popup-overlay" id="clickOverlay" onclick="closeClickPopup(event)">
+  <div class="click-popup">
+    <div class="click-popup-title">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5l-4.5-4.5 1.41-1.41L10 13.67l7.09-7.09 1.41 1.41L10 16.5z"/>
+      </svg>
+      Click tag fired successfully
+    </div>
+    <div class="click-popup-label">Click-through URL</div>
+    <div class="click-popup-url" id="popupUrl"></div>
+    <div class="click-popup-note" id="popupNote"></div>
+    <div class="click-popup-actions">
+      <button class="popup-btn" onclick="closeClickPopup()">Close</button>
+      <button class="popup-btn primary" id="popupOpenBtn" onclick="openClickUrl()" style="display:none">Open URL</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── State ─────────────────────────────────────────────────────────────────────
+let currentZip       = null;
+let validationResult = null;
+let adWidth  = 300;
+let adHeight = 250;
+let previewScale    = 1;
+let previewVisible  = true;
+let previewSrcdoc   = '';
+let lastClickUrl    = '';
+
+// ─── Tab switching ──────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.getElementById('tabAsset').classList.toggle('active',   tab === 'asset');
+  document.getElementById('tabLanding').classList.toggle('active', tab === 'landing');
+  document.getElementById('assetPage').style.display   = tab === 'asset'   ? 'block' : 'none';
+  document.getElementById('landingPage').style.display = tab === 'landing' ? 'block' : 'none';
+  document.getElementById('uploadPage').style.display  = 'none';
+}
+
+// ─── Drag & drop ────────────────────────────────────────────────────────────────
+function onDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('drag-over'); }
+function onDragLeave()  { document.getElementById('dropZone').classList.remove('drag-over'); }
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f) processFile(f);
+}
+function onFileSelect(e) {
+  const f = e.target.files[0];
+  if (f) processFile(f);
+}
+
+// ─── Main entry ─────────────────────────────────────────────────────────────────
+async function processFile(file) {
+  if (!/\.(zip|adz)$/i.test(file.name)) { alert('Please select a .zip or .adz file.'); return; }
+
+  // Show asset page (loading state)
+  document.getElementById('uploadPage').style.display  = 'none';
+  document.getElementById('landingPage').style.display = 'none';
+  document.getElementById('assetPage').style.display   = 'block';
+  document.getElementById('tabAsset').classList.add('active');
+  document.getElementById('tabLanding').classList.remove('active');
+  document.getElementById('cardSubtitle').textContent  = file.name + ' | ' + formatBytes(file.size);
+  document.getElementById('checksGrid').innerHTML = '<div style="padding:20px 16px;color:#9e9e9e;font-size:13px">Validating…</div>';
+  document.getElementById('previewLoading').style.display = 'flex';
+  document.getElementById('previewFrame').srcdoc = '';
+
+  // Parse ZIP
+  let zip;
+  try {
+    zip = await JSZip.loadAsync(file);
+  } catch(e) {
+    document.getElementById('checksGrid').innerHTML = `<div class="checks-row">${renderCheck({
+      id:'zip', name:'Valid ZIP archive', pass:false,
+      detail:'File could not be parsed as a ZIP archive: ' + esc(e.message)
+    })}</div>`;
+    document.getElementById('previewLoading').style.display = 'none';
+    return;
+  }
+  currentZip = zip;
+
+  // Validate
+  const result = await runValidation(zip);
+  validationResult = result;
+
+  // Render checks
+  const LEFT  = ['fourth-party','gwd-env','hard-coded','missing-asset','orphaned','secure-url'];
+  const RIGHT = ['file-type','html5-feat','invalid-click','missing-click','primary-asset','top-level'];
+  document.getElementById('checksGrid').innerHTML = LEFT.map((leftId, i) => {
+    const rightId = RIGHT[i];
+    return `<div class="checks-row">
+      ${renderCheck({id: leftId,  ...result.checks[leftId]})}
+      ${renderCheck({id: rightId, ...result.checks[rightId]})}
+    </div>`;
+  }).join('');
+
+  // Landing page tab
+  populateLandingTab(result.clickTags);
+  document.getElementById('landingRow').style.display = result.clickTags.length ? 'flex' : 'none';
+
+  // Dimensions
+  adWidth  = result.adWidth  || 300;
+  adHeight = result.adHeight || 250;
+  document.getElementById('dimW').value = adWidth;
+  document.getElementById('dimH').value = adHeight;
+  syncDeviceDropdown();
+
+  // Build and load preview
+  previewSrcdoc = await buildPreviewSrcdoc(zip, result.entryPath);
+  loadPreviewFrame();
+}
+
+// ─── Validation ─────────────────────────────────────────────────────────────────
+async function runValidation(zip) {
+  const entries = [];
+  zip.forEach((path, entry) => { if (!entry.dir) entries.push({path, entry}); });
+
+  const fc = {};
+  for (const {path, entry} of entries) fc[path] = await entry.async('uint8array');
+
+  const allPaths = entries.map(e => e.path);
+  const dec = b => new TextDecoder('utf-8',{fatal:false}).decode(b);
+
+  // ── Primary Creative Asset ──────────────────────────────────────────────────
+  const htmlPaths = allPaths.filter(p => /\.html?$/i.test(p));
+  const rootHtml  = htmlPaths.filter(p => !p.includes('/'));
+  const entryPath = rootHtml.find(p => /^index\.html?$/i.test(p))
+    || (rootHtml.length  === 1 ? rootHtml[0]  : null)
+    || (htmlPaths.length === 1 ? htmlPaths[0] : null)
+    || htmlPaths[0] || null;
+
+  const primaryPass = !!entryPath;
+
+  // ── Parse HTML + JS ─────────────────────────────────────────────────────────
+  let htmlContent = entryPath ? dec(fc[entryPath]) : '';
+  let doc = null;
+  if (htmlContent) doc = new DOMParser().parseFromString(htmlContent, 'text/html');
+  let allCode = htmlContent;
+  for (const {path} of entries) {
+    if (/\.js$/i.test(path)) allCode += '\n' + dec(fc[path]);
+  }
+
+  // ── Missing click tag ────────────────────────────────────────────────────────
+  const hasClickTag = /\bclickTag\b/i.test(allCode);
+
+  // ── Invalid click tag ────────────────────────────────────────────────────────
+  const validUsage = hasClickTag &&
+    /window\.open\s*\(\s*(?:window\.)?clickTag|href\s*=\s*["']javascript:[^"']*clickTag/i.test(allCode);
+
+  // ── Hard coded click tag ─────────────────────────────────────────────────────
+  const hardCodedMatch = hasClickTag
+    ? /(?:var|let|const)\s+clickTag\d*\s*=\s*["'](https?:\/\/[^"']{4,})["']/i.exec(allCode)
+    : null;
+
+  // ── Top level click tag ──────────────────────────────────────────────────────
+  // Top-level means accessible as window.clickTag — declared outside a function.
+  // Heuristic: var/let/const declaration exists AND it doesn't appear to be
+  // exclusively inside a function body (look for declaration not preceded by `function` context).
+  const topLevelDeclRe = /(?:var|let|const)\s+clickTag\d*\s*=/;
+  const insideFnRe = /function[\s\S]*?\{[\s\S]*?(?:var|let|const)\s+clickTag\d*\s*=[\s\S]*?\}/;
+  const hasDecl = topLevelDeclRe.test(allCode);
+  const onlyInFn = insideFnRe.test(allCode) && !topLevelDeclRe.test(allCode.replace(insideFnRe, ''));
+  const isTopLevel = hasClickTag && hasDecl && !onlyInFn;
+
+  // ── File Type/Count ──────────────────────────────────────────────────────────
+  const SUPPORTED = new Set(['html','htm','js','css','jpg','jpeg','gif','png','json','xml','svg','eot','otf','ttf','woff','woff2']);
+  const unsupported = allPaths.filter(p => !SUPPORTED.has((p.split('.').pop()||'').toLowerCase()));
+  const totalBytes  = Object.values(fc).reduce((s,b) => s+b.length, 0);
+  const fileTypeOk  = entries.length <= 100 && totalBytes <= 10*1024*1024 && unsupported.length === 0;
+
+  // ── HTML5 Not Allowed Features ───────────────────────────────────────────────
+  const BANNED    = ['localStorage','sessionStorage','indexedDB','openDatabase'];
+  const foundAPIs = BANNED.filter(api => new RegExp(`\\b${api}\\b`).test(allCode));
+
+  // ── Collect referenced assets ────────────────────────────────────────────────
+  const refRe = /(?:src|href|url)\s*[:=\(]\s*["']?([^"'\)\s>?#\n]+)/gi;
+  const referenced = new Set();
+  let rm;
+  while ((rm = refRe.exec(allCode)) !== null) {
+    const ref = rm[1].replace(/^\.\//, '').split('?')[0].split('#')[0];
+    if (ref && ref.length > 1 && !/^(https?:|\/\/|data:|javascript:|mailto:|tel:|#)/.test(ref)) {
+      referenced.add(ref);
+      referenced.add(ref.split('/').pop());
+    }
+  }
+
+  // ── Missing asset ────────────────────────────────────────────────────────────
+  const missing = [...referenced].filter(ref =>
+    ref && ref.length > 1 && ref.includes('.') && !/\s/.test(ref)
+    && !allPaths.some(p => p === ref || p.endsWith('/'+ref) || p.split('/').pop() === ref)
+  );
+
+  // ── Orphaned asset ───────────────────────────────────────────────────────────
+  const orphaned = allPaths.filter(p => {
+    if (p === entryPath) return false;
+    const base = p.split('/').pop();
+    return !referenced.has(p) && !referenced.has(base);
+  });
+
+  // ── 4th party calls ──────────────────────────────────────────────────────────
+  const GOOGLE_DOMAINS = ['google.com','googlesyndication.com','googletagservices.com',
+    'doubleclick.net','2mdn.net','gstatic.com','googleapis.com','google-analytics.com',
+    'googletagmanager.com'];
+  const extRe2 = /(?:src|href)\s*=\s*["'](https?:\/\/[^"'\s]+)["']/gi;
+  const fourthParty = [];
+  let em;
+  while ((em = extRe2.exec(htmlContent)) !== null) {
+    const url = em[1];
+    if (!GOOGLE_DOMAINS.some(d => url.includes(d))) fourthParty.push(url);
+  }
+
+  // ── Secure URL ───────────────────────────────────────────────────────────────
+  const insecRe = /(?:src|href)\s*=\s*["'](http:\/\/[^"'\s]+)["']/gi;
+  const insecure = [];
+  while ((em = insecRe.exec(htmlContent)) !== null) insecure.push(em[1]);
+
+  // ── GWD ──────────────────────────────────────────────────────────────────────
+  const isGwd = /google-web-designer|gwd-|gwdAnimation|gwd\.actions/i.test(htmlContent);
+
+  // ── Ad dimensions ────────────────────────────────────────────────────────────
+  let adW = 300, adH = 250;
+  if (doc) {
+    const meta = doc.querySelector('meta[name="ad.size"]');
+    if (meta) {
+      const c = meta.getAttribute('content') || '';
+      const wm = /width\s*=\s*(\d+)/i.exec(c);
+      const hm = /height\s*=\s*(\d+)/i.exec(c);
+      if (wm) adW = +wm[1];
+      if (hm) adH = +hm[1];
+    }
+  }
+
+  // ── Click tags ───────────────────────────────────────────────────────────────
+  const clickTags = [];
+  const ctRe = /(?:var|let|const)\s+(clickTag\d*)\s*=\s*["']([^"']*)["']/g;
+  let ct;
+  while ((ct = ctRe.exec(allCode)) !== null) clickTags.push({name:ct[1], url:ct[2]});
+  if (hasClickTag && clickTags.length === 0) clickTags.push({name:'clickTag', url:''});
+
+  // ── Build check results ──────────────────────────────────────────────────────
+  return {
+    entryPath, adWidth: adW, adHeight: adH, clickTags,
+    checks: {
+      'fourth-party': {
+        name: '4th party calls check',
+        pass: fourthParty.length === 0,
+        detail: fourthParty.length === 0
+          ? 'Checks that all assets are relative to creative. Exceptions may be granted for specific URLs depending on policy.'
+          : `The creative loads resources from non-Google external domains. Third-party calls may be blocked depending on publisher and Campaign Manager 360 policy. Contact the creative developer to remove or whitelist these calls.`
+            + moreDetails(fourthParty.slice(0,8).map(u => `FOURTH_PARTY_CALL found in ${u}`))
+      },
+      'gwd-env': {
+        name: 'GWD environment check',
+        pass: true,
+        detail: 'Ensures creatives built in Google Web Designer were created using the correct environment.'
+      },
+      'hard-coded': {
+        name: 'Hard coded click tag check',
+        pass: !hardCodedMatch,
+        detail: hardCodedMatch
+          ? `The creative contains a hard-coded URL in a click tag variable. Campaign Manager 360 sets the click tag value at serve time — the variable should be initialized to an empty string (<code>var clickTag = "";</code>).`
+            + moreDetails([`CLICK_TAG_HARD_CODED: ${truncate(hardCodedMatch[1], 100)}`])
+          : 'Ensures no hard coded click tags are present.'
+      },
+      'missing-asset': {
+        name: 'Missing asset check',
+        pass: missing.length === 0,
+        detail: missing.length === 0
+          ? 'Ensures that all referenced assets are present in the bundle.'
+          : `The creative references files that are not present in the ZIP bundle. Reach out to the creative developer to ensure all referenced assets are included.`
+            + moreDetails(missing.slice(0,8).map(f => `ASSET_MISSING: ${f}`), missing.length > 8 ? missing.length - 8 : 0)
+      },
+      'orphaned': {
+        name: 'Orphaned asset check',
+        pass: orphaned.length === 0,
+        detail: orphaned.length === 0
+          ? 'Ensures no extraneous files are included in the bundle.'
+          : `The creative bundle contains files that are not referenced by the creative. Contact the creative developer to remove extraneous files from the ZIP.`
+            + moreDetails(orphaned.slice(0,8).map(f => `ASSET_ORPHANED: ${f}`), orphaned.length > 8 ? orphaned.length - 8 : 0)
+      },
+      'secure-url': {
+        name: 'Secure URL check',
+        pass: insecure.length === 0,
+        detail: insecure.length === 0
+          ? 'Checks that all non-relative assets are loaded over HTTPS.'
+          : `The creative loads resources over insecure HTTP. All external resources must use HTTPS to prevent mixed-content warnings and ensure the creative loads in secure environments.`
+            + moreDetails(insecure.slice(0,8).map(u => `INSECURE_URL found in ${u}`))
+      },
+      'file-type': {
+        name: 'File Type/Count',
+        pass: fileTypeOk,
+        detail: fileTypeOk
+          ? 'Ensures all files contained in the zip bundle are supported.'
+          : (() => {
+              const msgs = [];
+              const details = [];
+              if (unsupported.length) {
+                msgs.push(`The creative contains a file type that isn't supported by DCM. Supported file types are HTML, HTM, JS, CSS, JPG, JPEG, GIF, PNG, JSON, XML, and SVG. To resolve this issue, contact the creative developer and request that any other file types are removed or replaced.`);
+                unsupported.forEach(f => details.push(`FILE_TYPE_INVALID found in ${f}`));
+              }
+              if (entries.length > 100) {
+                msgs.push(`The creative contains ${entries.length} files, which exceeds the 100-file limit.`);
+                details.push(`FILE_COUNT_EXCEEDS_LIMIT: ${entries.length} files (max 100)`);
+              }
+              if (totalBytes > 10*1024*1024) {
+                msgs.push(`The creative's total uncompressed size is ${formatBytes(totalBytes)}, which exceeds the 10 MB limit.`);
+                details.push(`FILE_SIZE_EXCEEDS_LIMIT: ${formatBytes(totalBytes)} (max 10 MB)`);
+              }
+              return msgs.join(' ') + moreDetails(details);
+            })()
+      },
+      'html5-feat': {
+        name: 'HTML5 Not Allowed Features check',
+        pass: foundAPIs.length === 0,
+        detail: foundAPIs.length === 0
+          ? 'Checks for unsupported HTML5 features.'
+          : `The creative uses HTML5 APIs that are not permitted by Campaign Manager 360. To protect user privacy, local and session storage APIs are blocked. Contact the creative developer to remove all references to these APIs.`
+            + moreDetails(foundAPIs.map(a => `HTML5_FEATURE_NOT_ALLOWED: ${a}`))
+      },
+      'invalid-click': {
+        name: 'Invalid click tag check',
+        pass: !hasClickTag ? false : validUsage,
+        detail: !hasClickTag
+          ? `The creative does not contain a click tag, so the click tag implementation cannot be validated.`
+            + moreDetails(['CLICK_TAG_MISSING'])
+          : validUsage
+            ? 'Ensures any click tags present are valid.'
+            : `The click tag variable is present but does not appear to be used to open the landing page. The standard implementation is <code>window.open(window.clickTag)</code>. Contact the creative developer to correct the click tag usage.`
+              + moreDetails(['CLICK_TAG_INVALID'])
+      },
+      'missing-click': {
+        name: 'Missing click tag check',
+        pass: hasClickTag,
+        detail: hasClickTag
+          ? 'Ensures that required click tags are present.'
+          : `The creative is missing a click tag. Every creative must include a <code>clickTag</code> variable so Campaign Manager 360 can track and redirect clicks. Reach out to the creative developer to add a valid click tag to the primary HTML file.`
+            + moreDetails(['CLICK_TAG_MISSING'])
+      },
+      'primary-asset': {
+        name: 'Primary Creative Asset',
+        pass: primaryPass,
+        detail: primaryPass
+          ? 'Ensures that the creative bundle includes a primary asset.'
+          : `The creative does not contain a primary HTML file, which is essential for the creative to be displayed. Reach out to the creative developer to resolve this issue by adding an HTML file to the creative.`
+            + moreDetails(['PRIMARY_HTML_MISSING'])
+      },
+      'top-level': {
+        name: 'Top level click tag check',
+        pass: !hasClickTag ? false : isTopLevel,
+        detail: !hasClickTag
+          ? `The creative does not contain a click tag in the top-level HTML file.`
+            + moreDetails(['CLICK_TAG_NOT_TOP_LEVEL'])
+          : isTopLevel
+            ? 'Ensures a click tag is present in the top-level html file.'
+            : `The click tag variable is not declared at the top level of the primary HTML file. The <code>clickTag</code> variable must be accessible as <code>window.clickTag</code> for Campaign Manager 360 to inject the destination URL. Declare it outside any function or event handler.`
+              + moreDetails(['CLICK_TAG_NOT_TOP_LEVEL'])
+      },
+    }
+  };
+}
+
+// ─── Render a single check row ───────────────────────────────────────────────
+function renderCheck({id, name, pass, detail}) {
+  const icon = pass
+    ? `<svg class="icon-pass" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5l-4.5-4.5 1.41-1.41L10 13.67l7.09-7.09 1.41 1.41L10 16.5z"/></svg>`
+    : `<svg class="icon-fail" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`;
+  return `<div class="check-item" id="chk-${id}" onclick="toggleCheck('${id}')">
+    <div class="check-header">
+      ${icon}
+      <span class="check-name">${esc(name)}</span>
+      <svg class="check-caret" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+    </div>
+    <div class="check-detail">${detail}</div>
+  </div>`;
+}
+
+function toggleCheck(id) {
+  document.getElementById('chk-'+id).classList.toggle('open');
+}
+
+// ─── Preview builder ─────────────────────────────────────────────────────────
+async function buildPreviewSrcdoc(zip, entryPath) {
+  if (!zip || !entryPath) return '';
+
+  const fileData = {};
+  zip.forEach((path, entry) => { if (!entry.dir) fileData[path] = entry; });
+
+  const content = {};
+  for (const [path, entry] of Object.entries(fileData)) {
+    const bytes = await entry.async('uint8array');
+    content[path] = { bytes };
+  }
+
+  const dec = b => new TextDecoder('utf-8',{fatal:false}).decode(b);
+  const getText = p => dec(content[p].bytes);
+
+  function findFile(ref) {
+    const clean = ref.split('?')[0].split('#')[0];
+    if (content[clean]) return clean;
+    const base = clean.split('/').pop();
+    return Object.keys(content).find(k => k.split('/').pop() === base) || null;
+  }
+
+  function resolveRef(base, ref) {
+    if (/^(https?:|\/\/|data:|javascript:|#|blob:)/.test(ref)) return null;
+    const clean = ref.split('?')[0].split('#')[0];
+    const dir   = base.includes('/') ? base.slice(0, base.lastIndexOf('/')+1) : '';
+    const parts = (dir + clean).split('/');
+    const norm  = [];
+    for (const p of parts) { if (p==='..') norm.pop(); else if (p && p!=='.') norm.push(p); }
+    return norm.join('/');
+  }
+
+  function toDataUri(path) {
+    const d = content[path];
+    if (!d) return null;
+    const bytes = d.bytes;
+    let bin = '';
+    // chunk to avoid call stack overflow on large files
+    for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return `data:${getMime(path)};base64,${btoa(bin)}`;
+  }
+
+  function processCSS(cssText, cssPath) {
+    return cssText.replace(/url\(\s*(['"]?)([^'")\n]+)\1\s*\)/g, (m, q, ref) => {
+      if (/^(data:|https?:|\/\/)/.test(ref)) return m;
+      const resolved = resolveRef(cssPath, ref);
+      const found = (resolved && findFile(resolved)) || findFile(ref.split('/').pop());
+      if (!found) return m;
+      const uri = toDataUri(found);
+      return uri ? `url("${uri}")` : m;
+    });
+  }
+
+  let html = getText(entryPath);
+
+  // Replace <link href="...css">
+  html = html.replace(/<link([^>]+)>/gi, (match, attrs) => {
+    const hm = /\bhref\s*=\s*(["'])([^"']+)\1/.exec(attrs);
+    if (!hm) return match;
+    const ref = hm[2];
+    if (/^(https?:|\/\/|data:)/.test(ref)) return match;
+    const resolved = resolveRef(entryPath, ref);
+    const found = (resolved && findFile(resolved)) || findFile(ref.split('/').pop());
+    if (!found) return match;
+    const processed = processCSS(getText(found), found);
+    return match.replace(hm[0], `href="data:text/css;charset=utf-8,${encodeURIComponent(processed)}"`);
+  });
+
+  // Replace <script src="...">
+  html = html.replace(/(<script\b[^>]*?)\s+src\s*=\s*(["'])([^"']+)\2([^>]*>)/gi, (m, pre, q, ref, post) => {
+    if (/^(https?:|\/\/|data:)/.test(ref)) return m;
+    const resolved = resolveRef(entryPath, ref);
+    const found = (resolved && findFile(resolved)) || findFile(ref.split('/').pop());
+    if (!found) return m;
+    return `${pre} src="data:application/javascript;charset=utf-8,${encodeURIComponent(getText(found))}"${post}`;
+  });
+
+  // Replace img/video src
+  html = html.replace(/\b(src|poster)\s*=\s*(["'])([^"']+)\2/gi, (m, attr, q, ref) => {
+    if (/^(https?:|\/\/|data:|javascript:|blob:)/.test(ref)) return m;
+    const resolved = resolveRef(entryPath, ref);
+    const found = (resolved && findFile(resolved)) || findFile(ref.split('/').pop());
+    if (!found) return m;
+    const uri = toDataUri(found);
+    return uri ? `${attr}="${uri}"` : m;
+  });
+
+  // Inject click interceptor
+  const injected = `<script>(function(){
+  window.open = function(url, t, f) {
+    try { parent.postMessage({type:'clickTag', url: url || ''}, '*'); } catch(e) {}
+    return null;
+  };
+  document.addEventListener('click', function(e) {
+    var a = e.target && e.target.closest ? e.target.closest('a') : null;
+    if (!a) return;
+    var href = a.getAttribute('href') || '';
+    if (href.indexOf('javascript:') === 0) {
+      e.preventDefault();
+      try { (new Function(href.slice(11)))(); } catch(ex) {}
+    }
+  }, true);
+})();<\/script>`;
+
+  if (/<head[^>]*>/i.test(html)) {
+    html = html.replace(/(<head[^>]*>)/i, '$1' + injected);
+  } else {
+    html = injected + html;
+  }
+
+  return html;
+}
+
+// ─── Load / resize preview ───────────────────────────────────────────────────
+function loadPreviewFrame() {
+  const frame = document.getElementById('previewFrame');
+  const wrap  = document.getElementById('previewWrap');
+
+  frame.style.width  = adWidth  + 'px';
+  frame.style.height = adHeight + 'px';
+  frame.style.transformOrigin = 'top left';
+  frame.style.transform = `scale(${previewScale})`;
+  wrap.style.width  = Math.round(adWidth  * previewScale) + 'px';
+  wrap.style.height = Math.round(adHeight * previewScale) + 'px';
+
+  frame.srcdoc = previewSrcdoc;
+  frame.onload = () => {
+    document.getElementById('previewLoading').style.display = 'none';
+  };
+}
+
+// ─── Controls ────────────────────────────────────────────────────────────────
+function onDeviceChange() {
+  const val = document.getElementById('deviceSelect').value;
+  if (!val) return;
+  const [w, h] = val.split('x').map(Number);
+  adWidth = w; adHeight = h;
+  document.getElementById('dimW').value = w;
+  document.getElementById('dimH').value = h;
+  loadPreviewFrame();
+}
+
+function onDimChange() {
+  adWidth  = parseInt(document.getElementById('dimW').value) || 300;
+  adHeight = parseInt(document.getElementById('dimH').value) || 250;
+  document.getElementById('deviceSelect').value = '';
+  loadPreviewFrame();
+}
+
+function syncDeviceDropdown() {
+  const val = `${adWidth}x${adHeight}`;
+  const sel = document.getElementById('deviceSelect');
+  sel.value = [...sel.options].some(o => o.value === val) ? val : '';
+}
+
+function onScaleChange() {
+  previewScale = parseFloat(document.getElementById('scaleSelect').value) || 1;
+  loadPreviewFrame();
+}
+
+function togglePreview() {
+  previewVisible = !previewVisible;
+  document.getElementById('previewWrap').style.visibility = previewVisible ? 'visible' : 'hidden';
+}
+
+// ─── Click-through popup ─────────────────────────────────────────────────────
+window.addEventListener('message', e => {
+  if (!e.data || e.data.type !== 'clickTag') return;
+  const url = e.data.url || '';
+  lastClickUrl = url;
+  const urlEl  = document.getElementById('popupUrl');
+  const noteEl = document.getElementById('popupNote');
+  const openBtn = document.getElementById('popupOpenBtn');
+  if (url) {
+    urlEl.textContent   = url;
+    urlEl.className     = 'click-popup-url';
+    noteEl.textContent  = 'Campaign Manager 360 will replace this with the trafficking destination URL.';
+    openBtn.style.display = '';
+  } else {
+    urlEl.textContent   = 'No URL assigned — will be set by Campaign Manager 360 at serve time.';
+    urlEl.className     = 'click-popup-url empty';
+    noteEl.textContent  = 'This is expected when clickTag is declared as var clickTag = "";';
+    openBtn.style.display = 'none';
+  }
+  document.getElementById('clickOverlay').classList.add('show');
+});
+
+function closeClickPopup(e) {
+  if (e && e.target !== document.getElementById('clickOverlay')) return;
+  document.getElementById('clickOverlay').classList.remove('show');
+}
+
+function openClickUrl() {
+  if (lastClickUrl) window.open(lastClickUrl, '_blank', 'noopener');
+  document.getElementById('clickOverlay').classList.remove('show');
+}
+
+// ─── Landing page tab ─────────────────────────────────────────────────────────
+function populateLandingTab(clickTags) {
+  const el = document.getElementById('lpContent');
+  if (!clickTags || clickTags.length === 0) {
+    el.innerHTML = '<div class="lp-empty">No click tags detected in this creative.</div>';
+    return;
+  }
+  el.innerHTML = clickTags.map(ct => `
+    <div class="lp-row">
+      <span class="lp-name">${esc(ct.name)}</span>
+      <span class="lp-url${ct.url ? '' : ' empty'}">${ct.url ? esc(ct.url) : 'No URL — will be set by ad server'}</span>
+      ${ct.url ? `<button class="text-btn" onclick="window.open(${JSON.stringify(ct.url)},'_blank','noopener')">Open</button>` : ''}
+    </div>`
+  ).join('');
+}
+
+// ─── Actions ─────────────────────────────────────────────────────────────────
+function startOver() {
+  currentZip = null; validationResult = null; previewSrcdoc = '';
+  document.getElementById('fileInput').value = '';
+  document.getElementById('uploadPage').style.display  = 'flex';
+  document.getElementById('assetPage').style.display   = 'none';
+  document.getElementById('landingPage').style.display = 'none';
+  document.getElementById('tabAsset').classList.add('active');
+  document.getElementById('tabLanding').classList.remove('active');
+  document.getElementById('previewFrame').srcdoc = '';
+  document.getElementById('previewLoading').style.display = 'flex';
+}
+
+function shareResults() {
+  const url = window.location.href;
+  if (navigator.clipboard) navigator.clipboard.writeText(url).then(() => alert('Link copied to clipboard.'));
+  else prompt('Copy this link:', url);
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+function moreDetails(lines, extraCount = 0) {
+  if (!lines || lines.length === 0) return '';
+  const items = lines.map(l => `<span class="detail-line">Source: ${esc(l)}</span>`).join('');
+  const extra = extraCount > 0 ? `<span class="detail-line" style="color:#9e9e9e">…and ${extraCount} more</span>` : '';
+  return `<div class="more-details"><div class="more-details-label">More details:</div>${items}${extra}</div>`;
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function truncate(s, n) { return s.length > n ? s.slice(0, n) + '…' : s; }
+function formatBytes(b) {
+  if (b >= 1048576) return (b/1048576).toFixed(1) + ' MB';
+  if (b >= 1024)    return (b/1024).toFixed(1) + ' Kb';
+  return b + ' B';
+}
+function getMime(path) {
+  const ext = (path.split('.').pop()||'').toLowerCase();
+  return ({
+    html:'text/html', htm:'text/html',
+    js:'application/javascript', mjs:'application/javascript',
+    css:'text/css',
+    jpg:'image/jpeg', jpeg:'image/jpeg',
+    gif:'image/gif', png:'image/png', svg:'image/svg+xml',
+    webp:'image/webp',
+    json:'application/json', xml:'application/xml',
+    woff:'font/woff', woff2:'font/woff2', ttf:'font/ttf', otf:'font/otf',
+    eot:'application/vnd.ms-fontobject',
+    mp4:'video/mp4', webm:'video/webm',
+  })[ext] || 'application/octet-stream';
+}
+</script>
+</body>
+</html>
