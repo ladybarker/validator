@@ -1002,26 +1002,31 @@ async function buildPreviewSrcdoc(zip, entryPath) {
 
   let html = getText(entryPath);
 
-  // Replace <link href="...css">
+  // Replace <link href="...css"> with inline <style>
   html = html.replace(/<link([^>]+)>/gi, (match, attrs) => {
     const hm = /\bhref\s*=\s*(["'])([^"']+)\1/.exec(attrs);
     if (!hm) return match;
     const ref = hm[2];
     if (/^(https?:|\/\/|data:)/.test(ref)) return match;
+    const relm = /\brel\s*=\s*(["'])([^"']+)\1/.exec(attrs);
+    if (relm && relm[2].toLowerCase() !== 'stylesheet') return match;
     const resolved = resolveRef(entryPath, ref);
     const found = (resolved && findFile(resolved)) || findFile(ref.split('/').pop());
     if (!found) return match;
     const processed = processCSS(getText(found), found);
-    return match.replace(hm[0], `href="data:text/css;charset=utf-8,${encodeURIComponent(processed)}"`);
+    return `<style>${processed}</style>`;
   });
 
-  // Replace <script src="...">
-  html = html.replace(/(<script\b[^>]*?)\s+src\s*=\s*(["'])([^"']+)\2([^>]*>)/gi, (m, pre, q, ref, post) => {
+  // Replace <script src="..."> with inline <script>
+  html = html.replace(/(<script\b[^>]*?)\s+src\s*=\s*(["'])([^"']+)\2([^>]*>)([\s\S]*?)<\/script>/gi, (m, pre, q, ref, post, body) => {
     if (/^(https?:|\/\/|data:)/.test(ref)) return m;
     const resolved = resolveRef(entryPath, ref);
     const found = (resolved && findFile(resolved)) || findFile(ref.split('/').pop());
     if (!found) return m;
-    return `${pre} src="data:application/javascript;charset=utf-8,${encodeURIComponent(getText(found))}"${post}`;
+    // strip src and type attributes, keep other attributes (e.g. async is irrelevant when inlining)
+    const cleanAttrs = pre.replace(/\s+src\s*=\s*(["'])[^"']*\1/gi, '')
+                          .replace(/\s+type\s*=\s*(["'])[^"']*\1/gi, '');
+    return `${cleanAttrs}>${getText(found)}</script>`;
   });
 
   // Replace img/video src
