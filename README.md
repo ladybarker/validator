@@ -1,46 +1,23 @@
-# AdAura — AI Ad Builder
+# HTML5 Ad Validator
 
-Travel advertising SaaS powered by Claude (Anthropic).
+A browser-based tool for previewing and validating HTML5 ad creatives.
 
-## Architecture
+## Usage
 
-### AI Layer
-All LLM calls route through `src/api/claudeClient.js` via the Anthropic `/v1/messages` API using `claude-sonnet-4-20250514`.
+Open `index.html` directly in a browser — no server or build step required.
 
-| Function | Description |
-|---|---|
-| `generateAdVariants` | Generates 4 creative ad variants from brand + brief context |
-| `analyzeAsset` | Vision analysis of uploaded images (tags, mood, quality flags) |
-| `scrapeWebsite` | Extracts brand metadata and images from a URL |
-| `invokeClaude` | Base API call — handles both remote URLs and `data:` base64 images |
+## Features
 
-Gemini is preserved for any future vision model routing but currently falls through to Claude.
+- **Upload** a ZIP file containing an HTML5 ad creative (drag-and-drop or file picker)
+- **Preview** the ad rendered in an iframe at configurable dimensions
+- **Resize** the preview using preset sizes or custom width × height inputs
+- **Click tracking** — intercepts clicks within the ad and displays the destination URL in a popup
+- **Landing page tab** — lists and previews landing pages included in the creative
 
-### Data Persistence
-No backend required. All entity data (`AdCampaign`, `AdVariant`, `Asset`, `BrandKit`, `ShareLink`) is stored in `localStorage` via a lightweight entity API in `claudeClient.js`.
+## Dependencies
 
-### Compatibility Shim
-`src/api/base44Client.js` re-exports `adaura as base44` — all 20+ existing component imports work unchanged.
+- [JSZip](https://stuk.github.io/jszip/) (loaded via CDN) — used to unpack uploaded ZIP files
 
 ## Setup
 
-```bash
-npm install
-npm run dev
-```
-
-No environment variables needed. The Anthropic API key is handled by the Claude.ai runtime.
-
-## Key Files
-
-```
-src/
-  api/
-    claudeClient.js   ← All AI + data logic (replaces base44 SDK)
-    base44Client.js   ← Shim: export { adaura as base44 }
-  lib/
-    AuthContext.jsx   ← Stub auth (no login wall)
-    app-params.js     ← Stub (no base44 app ID needed)
-  pages/
-    Create.jsx        ← Wizard flow calling generateAdVariants directly
-```
+No installation needed. Open `index.html` in any modern browser.
