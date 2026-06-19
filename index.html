@@ -35,10 +35,10 @@
       font-weight: 400;
       letter-spacing: .01em;
     }
-    .header-tabs { display: flex; padding: 0 8px; }
+    .header-tabs { display: flex; margin-left: 16px; }
     .tab {
       padding: 0 16px;
-      height: 48px;
+      height: 56px;
       display: flex;
       align-items: center;
       font-size: 13px;
@@ -64,15 +64,79 @@
     }
     .upload-card {
       background: #fff;
-      border-radius: 4px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.15);
-      padding: 48px 40px;
-      text-align: center;
+      border-radius: 2px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.08);
       width: 100%;
-      max-width: 480px;
+      max-width: 640px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      transition: border-color .15s, background .15s;
     }
-    .upload-card h2 { font-size: 22px; font-weight: 400; margin-bottom: 8px; }
-    .upload-card p  { font-size: 14px; color: #757575; margin-bottom: 28px; }
+    .upload-card.drag-over {
+      border-color: #1a73e8;
+      background: #f0f4ff;
+    }
+    .upload-drop-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(240,244,255,0.96);
+      border: 2px dashed #1a73e8;
+      border-radius: 2px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .upload-drop-overlay span {
+      font-size: 18px;
+      color: #1a73e8;
+      font-weight: 500;
+    }
+    .upload-card { position: relative; }
+    .upload-card-body { padding: 32px 32px 28px; }
+    .upload-card h2 { font-size: 20px; font-weight: 400; margin: 0 0 4px; }
+    .upload-card-sub { font-size: 13px; color: #757575; margin: 0 0 24px; }
+    .upload-steps { list-style: none; margin: 0; padding: 0; }
+    .upload-steps li {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #212121;
+    }
+    .upload-steps li:last-child { margin-bottom: 0; }
+    .step-num {
+      flex-shrink: 0;
+      width: 36px; height: 36px;
+      background: #9e9e9e;
+      color: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 500;
+      margin-top: 1px;
+    }
+    .step-text { padding-top: 4px; }
+    .step-text strong { display: block; font-weight: 500; font-size: 15px; margin-bottom: 2px; }
+    .step-text span { font-size: 13px; color: #757575; }
+    .upload-card-footer {
+      border-top: 1px solid #e0e0e0;
+      padding: 16px 32px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .upload-disclaimer {
+      font-size: 12px;
+      color: #757575;
+      text-align: center;
+      margin-top: 16px;
+      max-width: 640px;
+      line-height: 1.6;
+    }
+    .upload-disclaimer .disclaimer-star { color: #1a73e8; }
     .drop-zone {
       border: 2px dashed #bdbdbd;
       border-radius: 4px;
@@ -86,7 +150,7 @@
     .upload-btn {
       display: inline-block;
       padding: 10px 28px;
-      background: #1a7340;
+      background: #1a73e8;
       color: #fff;
       border: none;
       border-radius: 4px;
@@ -97,7 +161,7 @@
       letter-spacing: .05em;
       transition: background .15s;
     }
-    .upload-btn:hover { background: #155c33; }
+    .upload-btn:hover { background: #1557b0; }
     #fileInput { display: none; }
 
     /* ── Shared page wrapper ─────────────────────────────────────────────── */
@@ -110,9 +174,10 @@
       background: #fff;
       border-radius: 4px;
       box-shadow: 0 1px 4px rgba(0,0,0,.18);
-      max-width: 680px;
+      width: 100%;
+      max-width: 900px;
       margin: 0 auto;
-      overflow: hidden;
+      overflow: visible;
     }
 
     /* Card header */
@@ -346,6 +411,8 @@
       font-family: 'Roboto Mono', monospace;
       font-size: 12px;
       color: #c62828;
+      word-break: break-all;
+      overflow-wrap: anywhere;
     }
     .file-list { margin-top: 5px; display: flex; flex-wrap: wrap; gap: 4px; }
     .file-chip {
@@ -375,6 +442,28 @@
     }
     .icon-pass { color: #34a853; }
     .icon-fail { color: #ea4335; }
+    .icon-warn { color: #f9ab00; }
+
+    /* ── Validation summary ───────────────────────────────────────────────── */
+    .validation-summary {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid #e0e0e0;
+      background: #fafafa;
+    }
+    .summary-icon {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .summary-icon.pass { background: #34a853; }
+    .summary-icon.fail { background: #ea4335; }
+    .summary-icon.warn { background: #f9ab00; }
+    .summary-text strong { display: block; font-size: 15px; font-weight: 500; }
+    .summary-text span { font-size: 13px; color: #757575; }
 
     /* ── Card actions ─────────────────────────────────────────────────────── */
     .card-actions {
@@ -415,6 +504,131 @@
     .lp-url  { flex: 1; word-break: break-all; font-family: monospace; font-size: 12px; color: #1a73e8; }
     .lp-url.empty { color: #9e9e9e; font-style: italic; font-family: Roboto, sans-serif; }
 
+    /* ── Crawlability result card ─────────────────────────────────────────── */
+    .crawl-result {
+      border-top: 1px solid #e0e0e0;
+      padding: 20px 32px;
+    }
+    .crawl-result-label {
+      font-size: 13px;
+      color: #757575;
+      margin-bottom: 12px;
+    }
+    .crawl-result-label span { color: #1a73e8; }
+    .crawl-status {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 15px;
+      color: #212121;
+    }
+    .crawl-icon {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .crawl-icon.success { background: #34a853; }
+    .crawl-icon.failure { background: #d32f2f; }
+    .crawl-icon svg { display: block; }
+    .crawl-footer {
+      border-top: 1px solid #e0e0e0;
+      padding: 12px 32px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .crawl-share-btn {
+      background: none;
+      border: none;
+      color: #1a73e8;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+    .crawl-share-btn:hover { background: #e8f0fe; border-radius: 4px; }
+    .crawl-detail { margin-top: 12px; font-size: 13px; color: #212121; line-height: 1.6; }
+    .crawl-detail p { margin: 0 0 6px; }
+    .crawl-detail a { color: #1a73e8; }
+    .crawl-detail ul { margin: 4px 0 0 18px; padding: 0; }
+    .crawl-detail li { margin-bottom: 4px; }
+    .crawl-checking {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px; color: #757575;
+      border-top: 1px solid #e0e0e0;
+      padding: 20px 32px;
+    }
+
+    /* ── Landing page URL checker ─────────────────────────────────────────── */
+    .lp-checker-card {
+      background: #fff;
+      border-radius: 2px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.08);
+      max-width: 640px;
+      margin: 40px auto;
+      overflow: hidden;
+    }
+    .lp-checker-body { padding: 32px 32px 28px; }
+    .lp-checker-card h2 { font-size: 20px; font-weight: 400; margin: 0 0 4px; }
+    .lp-checker-card .lp-checker-sub { font-size: 13px; color: #757575; margin: 0 0 24px; }
+    .lp-checker-footer {
+      border-top: 1px solid #e0e0e0;
+      padding: 16px 32px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .lp-url-field {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .lp-url-field textarea {
+      flex: 1;
+      font-family: Roboto, sans-serif;
+      font-size: 14px;
+      color: #212121;
+      border: none;
+      border-bottom: 1px solid #9e9e9e;
+      outline: none;
+      resize: none;
+      padding: 4px 0;
+      min-height: 36px;
+      background: transparent;
+      line-height: 1.5;
+    }
+    .lp-url-field textarea:focus { border-bottom-color: #1a7340; }
+    .lp-url-field textarea.error { border-bottom-color: #d32f2f; }
+    .lp-url-field label {
+      position: absolute;
+      top: 4px;
+      left: 0;
+      font-size: 14px;
+      color: #9e9e9e;
+      pointer-events: none;
+      transition: color .15s;
+    }
+    .lp-url-field textarea:focus ~ label,
+    .lp-url-field textarea:not(:placeholder-shown) ~ label { color: #1a7340; font-size: 12px; top: -14px; }
+    .lp-url-field textarea.error ~ label { color: #d32f2f; }
+    .lp-url-error { font-size: 12px; color: #d32f2f; margin-top: 6px; min-height: 16px; }
+    .lp-check-btn {
+      background: #1a73e8;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .04em;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .lp-check-btn:hover { background: #1557b0; }
+
     /* ── Spinner ──────────────────────────────────────────────────────────── */
     .spin {
       width: 20px; height: 20px;
@@ -433,31 +647,55 @@
 <header class="header">
   <div class="header-bar">
     <span class="header-title">HTML5 Validator</span>
-  </div>
-  <div class="header-tabs">
-    <div class="tab active" id="tabAsset"   onclick="switchTab('asset')">Asset</div>
-    <div class="tab"        id="tabLanding" onclick="switchTab('landing')">Landing Page</div>
+    <div class="header-tabs">
+      <div class="tab active" id="tabAsset"   onclick="switchTab('asset')">Asset</div>
+      <div class="tab"        id="tabLanding" onclick="switchTab('landing')">Landing Page</div>
+    </div>
   </div>
 </header>
 
 <!-- ── Upload page ── -->
 <div id="uploadPage">
-  <div class="upload-card">
-    <h2>HTML5 Ad Validator</h2>
-    <p>Upload your HTML5 ad ZIP or ADZ file to validate it against Campaign Manager 360 requirements.</p>
-    <div class="drop-zone" id="dropZone"
-         ondragover="onDragOver(event)"
-         ondragleave="onDragLeave(event)"
-         ondrop="onDrop(event)"
-         onclick="document.getElementById('fileInput').click()">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="#9e9e9e" style="display:block;margin:0 auto 10px">
-        <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
-      </svg>
-      <div style="font-size:15px;color:#424242">Drop your ZIP or ADZ file here</div>
-      <div class="drop-zone-sub">or click to browse</div>
+  <div>
+    <div class="upload-card" id="uploadDropZone"
+         ondragover="uploadDragOver(event)" ondragleave="uploadDragLeave(event)" ondrop="uploadDrop(event)">
+      <div class="upload-drop-overlay" id="uploadDropOverlay">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="#1a73e8"><path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+        <span>Drop .zip file here</span>
+      </div>
+      <div class="upload-card-body">
+        <h2>Asset Validation</h2>
+        <p class="upload-card-sub">Check your DoubleClick Campaign Manager creative</p>
+        <ul class="upload-steps">
+          <li>
+            <div class="step-num">1</div>
+            <div class="step-text">
+              <strong>Upload your HTML5 creatives (.zip) <span style="color:#1a73e8">*</span></strong>
+              <span>Make sure your bundles contain all necessary assets. You may upload multiple zip files.</span>
+            </div>
+          </li>
+          <li>
+            <div class="step-num">2</div>
+            <div class="step-text">
+              <strong>Review validation results</strong>
+              <span>This will indicate if your creative will be accepted by DoubleClick Campaign Manager.</span>
+            </div>
+          </li>
+          <li>
+            <div class="step-num">3</div>
+            <div class="step-text">
+              <strong>Correct errors and reupload your creative</strong>
+              <span>Be sure to read the error messages carefully for tips on how to fix any issues.</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="upload-card-footer">
+        <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Upload</button>
+        <input type="file" id="fileInput" accept=".zip" onchange="onFileSelect(event)">
+      </div>
     </div>
-    <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Select File</button>
-    <input type="file" id="fileInput" accept=".zip,.adz" onchange="onFileSelect(event)">
+    <p class="upload-disclaimer"><span class="disclaimer-star">*</span> Before uploading your content, please be sure that you have all the necessary legal rights to do so. Please do not upload sensitive content. Your creative will be publicly accessible to anyone with the correct URL.</p>
   </div>
 </div>
 
@@ -535,6 +773,9 @@
       <button class="text-btn" onclick="switchTab('landing')">Test</button>
     </div>
 
+    <!-- Validation summary -->
+    <div class="validation-summary" id="validationSummary" style="display:none"></div>
+
     <!-- Checks grid -->
     <div class="checks-outer">
       <div id="checksGrid"></div>
@@ -551,16 +792,21 @@
 
 <!-- ── Landing page tab ── -->
 <div id="landingPage">
-  <div class="lp-card">
-    <div class="lp-header">
+  <div class="lp-checker-card">
+    <div class="lp-checker-body">
       <h2>Landing Page Validation</h2>
-      <p>Click tags detected in your creative. Verify that each URL resolves correctly before trafficking.</p>
+      <p class="lp-checker-sub">Check your landing page</p>
+      <div class="lp-url-field">
+        <textarea id="lpUrlInput" rows="1" placeholder=" "
+          oninput="lpClearError(this)"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();checkLandingUrls();}"></textarea>
+        <label for="lpUrlInput">Input landing page URLs here (one per line) *</label>
+      </div>
+      <div class="lp-url-error" id="lpUrlError"></div>
+      <div id="lpResults"></div>
     </div>
-    <div id="lpContent">
-      <div class="lp-empty">Upload an asset on the Asset tab to see landing pages.</div>
-    </div>
-    <div class="card-actions">
-      <button class="card-action-btn" onclick="startOver()">Start Over</button>
+    <div class="lp-checker-footer">
+      <button class="lp-check-btn" onclick="checkLandingUrls()">CHECK</button>
     </div>
   </div>
 </div>
@@ -592,16 +838,42 @@ let adWidth  = 300;
 let adHeight = 250;
 let previewScale    = 1;
 let previewVisible  = true;
-let previewSrcdoc   = '';
+let swReady = false;
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').then(reg => {
+    const sw = reg.installing || reg.waiting || reg.active;
+    if (sw && sw.state === 'activated') { swReady = true; }
+    else if (sw) { sw.addEventListener('statechange', e => { if (e.target.state === 'activated') swReady = true; }); }
+  }).catch(() => {});
+  navigator.serviceWorker.addEventListener('controllerchange', () => { swReady = true; });
+}
 let lastClickUrl    = '';
 
 // ─── Tab switching ──────────────────────────────────────────────────────────────
 function switchTab(tab) {
+  const hasFile = !!validationResult;
   document.getElementById('tabAsset').classList.toggle('active',   tab === 'asset');
   document.getElementById('tabLanding').classList.toggle('active', tab === 'landing');
-  document.getElementById('assetPage').style.display   = tab === 'asset'   ? 'block' : 'none';
+  document.getElementById('uploadPage').style.display  = tab === 'asset' && !hasFile ? 'flex' : 'none';
+  document.getElementById('assetPage').style.display   = tab === 'asset' && hasFile  ? 'block' : 'none';
   document.getElementById('landingPage').style.display = tab === 'landing' ? 'block' : 'none';
-  document.getElementById('uploadPage').style.display  = 'none';
+}
+
+// ─── Upload card drag & drop ─────────────────────────────────────────────────
+function uploadDragOver(e)  {
+  e.preventDefault();
+  document.getElementById('uploadDropOverlay').style.display = 'flex';
+}
+function uploadDragLeave(e) {
+  if (!e.currentTarget.contains(e.relatedTarget)) {
+    document.getElementById('uploadDropOverlay').style.display = 'none';
+  }
+}
+function uploadDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadDropOverlay').style.display = 'none';
+  const f = e.dataTransfer.files[0];
+  if (f) processFile(f);
 }
 
 // ─── Drag & drop ────────────────────────────────────────────────────────────────
@@ -620,7 +892,7 @@ function onFileSelect(e) {
 
 // ─── Main entry ─────────────────────────────────────────────────────────────────
 async function processFile(file) {
-  if (!/\.(zip|adz)$/i.test(file.name)) { alert('Please select a .zip or .adz file.'); return; }
+  if (!/\.zip$/i.test(file.name)) { alert('Please select a .zip file.'); return; }
 
   // Show asset page (loading state)
   document.getElementById('uploadPage').style.display  = 'none';
@@ -630,8 +902,9 @@ async function processFile(file) {
   document.getElementById('tabLanding').classList.remove('active');
   document.getElementById('cardSubtitle').textContent  = file.name + ' | ' + formatBytes(file.size);
   document.getElementById('checksGrid').innerHTML = '<div style="padding:20px 16px;color:#9e9e9e;font-size:13px">Validating…</div>';
+  document.getElementById('validationSummary').style.display = 'none';
   document.getElementById('previewLoading').style.display = 'flex';
-  document.getElementById('previewFrame').srcdoc = '';
+  document.getElementById('previewFrame').src = 'about:blank';
 
   // Parse ZIP
   let zip;
@@ -662,6 +935,8 @@ async function processFile(file) {
     </div>`;
   }).join('');
 
+  renderSummary(result.checks);
+
   // Landing page tab
   populateLandingTab(result.clickTags);
   document.getElementById('landingRow').style.display = result.clickTags.length ? 'flex' : 'none';
@@ -673,8 +948,8 @@ async function processFile(file) {
   document.getElementById('dimH').value = adHeight;
   syncDeviceDropdown();
 
-  // Build and load preview
-  previewSrcdoc = await buildPreviewSrcdoc(zip, result.entryPath);
+  // Build and load preview via Service Worker
+  await loadPreviewViaSW(zip, result.entryPath);
   loadPreviewFrame();
 }
 
@@ -841,9 +1116,10 @@ async function runValidation(zip) {
       'orphaned': {
         name: 'Orphaned asset check',
         pass: orphaned.length === 0,
+        warn: orphaned.length > 0,
         detail: orphaned.length === 0
           ? 'Ensures no extraneous files are included in the bundle.'
-          : `The creative bundle contains files that are not referenced by the creative. Contact the creative developer to remove extraneous files from the ZIP.`
+          : `The creative bundle contains files that are not referenced by the creative. These won't cause the ad to fail, but removing them will reduce file size and keep the bundle clean.`
             + moreDetails(orphaned.slice(0,8).map(f => `ASSET_ORPHANED: ${f}`), orphaned.length > 8 ? orphaned.length - 8 : 0)
       },
       'secure-url': {
@@ -928,10 +1204,13 @@ async function runValidation(zip) {
 }
 
 // ─── Render a single check row ───────────────────────────────────────────────
-function renderCheck({id, name, pass, detail}) {
-  const icon = pass
-    ? `<svg class="icon-pass" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5l-4.5-4.5 1.41-1.41L10 13.67l7.09-7.09 1.41 1.41L10 16.5z"/></svg>`
-    : `<svg class="icon-fail" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`;
+function renderCheck({id, name, pass, warn, detail}) {
+  const state = pass ? 'pass' : (warn ? 'warn' : 'fail');
+  const icon = state === 'pass'
+    ? `<svg class="icon-pass" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5l-4.5-4.5 1.41-1.41L10 13.67l7.09-7.09 1.41 1.41L10 16.5z"/></svg>`
+    : state === 'warn'
+    ? `<svg class="icon-warn" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`
+    : `<svg class="icon-fail" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`;
   return `<div class="check-item" id="chk-${id}" onclick="toggleCheck('${id}')">
     <div class="check-header">
       ${icon}
@@ -940,6 +1219,38 @@ function renderCheck({id, name, pass, detail}) {
     </div>
     <div class="check-detail">${detail}</div>
   </div>`;
+}
+
+function renderSummary(checks) {
+  const vals = Object.values(checks);
+  const failures = vals.filter(c => !c.pass && !c.warn);
+  const warnings = vals.filter(c => c.warn);
+  const allPass  = failures.length === 0 && warnings.length === 0;
+  const hasWarn  = failures.length === 0 && warnings.length > 0;
+
+  const state = allPass ? 'pass' : hasWarn ? 'warn' : 'fail';
+  const icon = state === 'pass'
+    ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`
+    : state === 'warn'
+    ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`
+    : `<svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`;
+  const title = allPass ? 'All checks passed'
+    : hasWarn ? 'Passed with warnings'
+    : `${failures.length} check${failures.length > 1 ? 's' : ''} failed`;
+  const sub = allPass
+    ? 'This creative meets all Campaign Manager 360 requirements.'
+    : hasWarn
+    ? `${warnings.length} item${warnings.length > 1 ? 's' : ''} flagged for review — not blocking, but recommended to fix.`
+    : `${warnings.length > 0 ? `${warnings.length} warning${warnings.length > 1 ? 's' : ''} and ` : ''}review the failed checks below before trafficking.`;
+
+  const el = document.getElementById('validationSummary');
+  el.style.display = 'flex';
+  el.innerHTML = `
+    <div class="summary-icon ${state}">${icon}</div>
+    <div class="summary-text">
+      <strong>${title}</strong>
+      <span>${sub}</span>
+    </div>`;
 }
 
 function toggleCheck(id) {
@@ -1002,6 +1313,11 @@ async function buildPreviewSrcdoc(zip, entryPath) {
 
   let html = getText(entryPath);
 
+  // Process url() references in already-inline <style> blocks
+  html = html.replace(/(<style\b[^>]*>)([\s\S]*?)(<\/style>)/gi, (m, open, css, close) => {
+    return open + processCSS(css, entryPath) + close;
+  });
+
   // Replace <link href="...css"> with inline <style>
   html = html.replace(/<link([^>]+)>/gi, (match, attrs) => {
     const hm = /\bhref\s*=\s*(["'])([^"']+)\1/.exec(attrs);
@@ -1026,10 +1342,10 @@ async function buildPreviewSrcdoc(zip, entryPath) {
     // strip src and type attributes, keep other attributes (e.g. async is irrelevant when inlining)
     const cleanAttrs = pre.replace(/\s+src\s*=\s*(["'])[^"']*\1/gi, '')
                           .replace(/\s+type\s*=\s*(["'])[^"']*\1/gi, '');
-    return `${cleanAttrs}>${getText(found)}</script>`;
+    return `${cleanAttrs}>${getText(found)}<\/script>`;
   });
 
-  // Replace img/video src
+  // Replace img/video src and poster
   html = html.replace(/\b(src|poster)\s*=\s*(["'])([^"']+)\2/gi, (m, attr, q, ref) => {
     if (/^(https?:|\/\/|data:|javascript:|blob:)/.test(ref)) return m;
     const resolved = resolveRef(entryPath, ref);
@@ -1039,8 +1355,217 @@ async function buildPreviewSrcdoc(zip, entryPath) {
     return uri ? `${attr}="${uri}"` : m;
   });
 
-  // Inject click interceptor
+  // Replace srcset attributes (comma-separated list of "url [descriptor]" pairs)
+  html = html.replace(/\bsrcset\s*=\s*(["'])([^"']+)\1/gi, (m, q, val) => {
+    const replaced = val.split(',').map(part => {
+      const [ref, ...rest] = part.trim().split(/\s+/);
+      if (!ref || /^(https?:|\/\/|data:|blob:)/.test(ref)) return part;
+      const resolved = resolveRef(entryPath, ref);
+      const found = (resolved && findFile(resolved)) || findFile(ref.split('/').pop());
+      if (!found) return part;
+      const uri = toDataUri(found);
+      return uri ? [uri, ...rest].join(' ') : part;
+    }).join(', ');
+    return `srcset=${q}${replaced}${q}`;
+  });
+
+  // Replace SVG <image href> and xlink:href
+  html = html.replace(/\b(xlink:href|href)\s*=\s*(["'])([^"'#][^"']*)\2/gi, (m, attr, q, ref) => {
+    if (/^(https?:|\/\/|data:|javascript:|blob:|#)/.test(ref)) return m;
+    const resolved = resolveRef(entryPath, ref);
+    const found = (resolved && findFile(resolved)) || findFile(ref.split('/').pop());
+    if (!found) return m;
+    const uri = toDataUri(found);
+    return uri ? `${attr}="${uri}"` : m;
+  });
+
+  // Replace url() references inside inline style attributes
+  html = html.replace(/\bstyle\s*=\s*(["'])([\s\S]*?)\1/gi, (m, q, styleText) => {
+    const replaced = styleText.replace(/url\(\s*(['"]?)([^'")\n]+)\1\s*\)/g, (um, uq, ref) => {
+      if (/^(data:|https?:|\/\/)/.test(ref)) return um;
+      const resolved = resolveRef(entryPath, ref);
+      const found = (resolved && findFile(resolved)) || findFile(ref.split('/').pop());
+      if (!found) return um;
+      const uri = toDataUri(found);
+      return uri ? `url("${uri}")` : um;
+    });
+    return `style=${q}${replaced}${q}`;
+  });
+
+  // Build virtual filesystem: all non-HTML files as data URIs keyed by every likely path alias
+  const vfs = {};
+  for (const [path, entry] of Object.entries(content)) {
+    const uri = toDataUri(path);
+    if (!uri) continue;
+    vfs[path] = uri;
+    vfs['./' + path] = uri;
+    const base = path.split('/').pop();
+    if (!vfs[base]) vfs[base] = uri;
+    if (!vfs['./' + base]) vfs['./' + base] = uri;
+  }
+  const vfsJson = JSON.stringify(vfs);
+
+  // Inject click interceptor + virtual filesystem image/fetch patcher
   const injected = `<script>(function(){
+  var __vfs = ${vfsJson};
+  function __resolve(src) {
+    if (!src || /^(data:|https?:|\/\/|blob:)/.test(src)) return src;
+    return __vfs[src] || __vfs[src.replace(/^\\.?\\//, '')] || __vfs[src.split('/').pop()] || src;
+  }
+  // Patch Image src
+  var _ImgSrc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+  if (_ImgSrc && _ImgSrc.set) {
+    Object.defineProperty(HTMLImageElement.prototype, 'src', {
+      get: _ImgSrc.get,
+      set: function(v) { _ImgSrc.set.call(this, __resolve(v)); },
+      configurable: true
+    });
+  }
+  // Patch setAttribute for src
+  var _origSetAttr = Element.prototype.setAttribute;
+  Element.prototype.setAttribute = function(name, value) {
+    if ((name === 'src' || name === 'poster') && this instanceof HTMLElement) {
+      _origSetAttr.call(this, name, __resolve(value));
+    } else {
+      _origSetAttr.call(this, name, value);
+    }
+  };
+  // Patch fetch
+  var _origFetch = window.fetch;
+  window.fetch = function(url, opts) {
+    var resolved = __resolve(typeof url === 'string' ? url : url);
+    if (resolved !== url && typeof resolved === 'string' && resolved.startsWith('data:')) {
+      return fetch('data:text/plain,').then(function() {
+        var parts = resolved.match(/^data:([^;]+);base64,(.+)$/);
+        if (!parts) return new Response('', {status:404});
+        var bin = atob(parts[2]);
+        var bytes = new Uint8Array(bin.length);
+        for (var i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+        return new Response(bytes.buffer, {status:200, headers:{'Content-Type':parts[1]}});
+      });
+    }
+    return _origFetch ? _origFetch.call(window, url, opts) : Promise.reject(new Error('fetch unavailable'));
+  };
+  // Patch XMLHttpRequest
+  var _origOpen = XMLHttpRequest.prototype.open;
+  XMLHttpRequest.prototype.open = function(method, url) {
+    var r = __resolve(url);
+    return _origOpen.apply(this, [method, r].concat(Array.prototype.slice.call(arguments, 2)));
+  };
+  // Patch CSSStyleDeclaration.setProperty — intercept ANY property value containing url()
+  var _origSetProp = CSSStyleDeclaration.prototype.setProperty;
+  CSSStyleDeclaration.prototype.setProperty = function(prop, value, priority) {
+    if (typeof value === 'string' && value.indexOf('url(') !== -1) {
+      value = value.replace(/url\\(\\s*(['"]?)([^'"\\)\\n]+)\\1\\s*\\)/g, function(m, q, ref) {
+        var r = __resolve(ref); return r && r !== ref ? 'url("' + r + '")' : m;
+      });
+    }
+    return _origSetProp.call(this, prop, value, priority);
+  };
+  // Patch background / backgroundImage direct property setters
+  ['background','backgroundImage'].forEach(function(prop) {
+    var desc = Object.getOwnPropertyDescriptor(CSSStyleDeclaration.prototype, prop);
+    if (desc && desc.set) {
+      Object.defineProperty(CSSStyleDeclaration.prototype, prop, {
+        get: desc.get,
+        set: function(v) {
+          if (typeof v === 'string') v = v.replace(/url\\(\\s*(['"]?)([^'"\\)\\n]+)\\1\\s*\\)/g, function(m,q,ref){
+            var r=__resolve(ref); return r&&r!==ref?'url("'+r+'")':m;
+          });
+          desc.set.call(this, v);
+        },
+        configurable: true
+      });
+    }
+  });
+  // Patch cssText setter (catches bulk style assignments)
+  var _cssText = Object.getOwnPropertyDescriptor(CSSStyleDeclaration.prototype, 'cssText');
+  if (_cssText && _cssText.set) {
+    Object.defineProperty(CSSStyleDeclaration.prototype, 'cssText', {
+      get: _cssText.get,
+      set: function(v) {
+        if (typeof v === 'string') v = v.replace(/url\\(\\s*(['"]?)([^'"\\)\\n]+)\\1\\s*\\)/g, function(m,q,ref){
+          var r=__resolve(ref); return r&&r!==ref?'url("'+r+'")':m;
+        });
+        _cssText.set.call(this, v);
+      },
+      configurable: true
+    });
+  }
+  // Patch setAttribute to handle srcset, href (SVG images), xlink:href
+  var _origSetAttr2 = Element.prototype.setAttribute;
+  Element.prototype.setAttribute = function(name, value) {
+    if (name === 'srcset' && typeof value === 'string') {
+      value = value.split(',').map(function(part) {
+        var tokens = part.trim().split(/\s+/);
+        tokens[0] = __resolve(tokens[0]);
+        return tokens.join(' ');
+      }).join(', ');
+    }
+    if ((name === 'href' || name === 'xlink:href') && this instanceof SVGImageElement) {
+      value = __resolve(value);
+    }
+    return _origSetAttr2.call(this, name, value);
+  };
+  // Patch SVGImageElement href.baseVal setter
+  try {
+    var _svgHref = Object.getOwnPropertyDescriptor(SVGImageElement.prototype, 'href');
+    if (_svgHref && _svgHref.get) {
+      var _origHrefGet = _svgHref.get;
+      Object.defineProperty(SVGImageElement.prototype, 'href', {
+        get: function() {
+          var anim = _origHrefGet.call(this);
+          var _origSet = Object.getOwnPropertyDescriptor(SVGAnimatedString.prototype, 'baseVal');
+          if (_origSet && _origSet.set) {
+            var el = this;
+            Object.defineProperty(anim, 'baseVal', {
+              get: function() { return _origSet.get.call(this); },
+              set: function(v) { _origSet.set.call(this, __resolve(v)); },
+              configurable: true
+            });
+          }
+          return anim;
+        },
+        configurable: true
+      });
+    }
+  } catch(e) {}
+  // MutationObserver: patch dynamically injected <style> tags and img src
+  function __patchStyleText(text) {
+    return text.replace(/url\\(\\s*(['"]?)([^'"\\)\\n]+)\\1\\s*\\)/g, function(m, q, ref) {
+      if (/^(data:|https?:|\\/\\/)/.test(ref)) return m;
+      var r = __resolve(ref);
+      return r && r !== ref ? 'url("' + r + '")' : m;
+    });
+  }
+  function __patchStyleEl(el) {
+    if (!el || el.nodeName !== 'STYLE') return;
+    var p = __patchStyleText(el.textContent || '');
+    if (p !== el.textContent) el.textContent = p;
+  }
+  function __patchNode(node) {
+    if (node.nodeName === 'STYLE') { __patchStyleEl(node); return; }
+    // text node whose parent is a <style> (fired when innerHTML is set)
+    if (node.nodeType === 3 && node.parentNode && node.parentNode.nodeName === 'STYLE') {
+      __patchStyleEl(node.parentNode); return;
+    }
+    if (node.nodeName === 'IMG' && node.getAttribute) {
+      var r = __resolve(node.getAttribute('src') || '');
+      if (r && r !== node.src) node.src = r;
+    }
+  }
+  new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      m.addedNodes.forEach(function(n) {
+        __patchNode(n);
+        if (n.querySelectorAll) n.querySelectorAll('style,img').forEach(__patchNode);
+      });
+      // characterData: text inside a <style> was modified in place
+      if (m.type === 'characterData' && m.target.parentNode && m.target.parentNode.nodeName === 'STYLE') {
+        __patchStyleEl(m.target.parentNode);
+      }
+    });
+  }).observe(document.documentElement, {childList:true, subtree:true, characterData:true});
   window.open = function(url, t, f) {
     try { parent.postMessage({type:'clickTag', url: url || ''}, '*'); } catch(e) {}
     return null;
@@ -1066,6 +1591,30 @@ async function buildPreviewSrcdoc(zip, entryPath) {
 }
 
 // ─── Load / resize preview ───────────────────────────────────────────────────
+let previewEntryPath = 'index.html';
+
+function applyPreviewScale() {
+  if (!validationResult) return;
+  const pane  = document.getElementById('previewPane');
+  const frame = document.getElementById('previewFrame');
+  const wrap  = document.getElementById('previewWrap');
+  if (!pane || !frame || !wrap) return;
+  const available = pane.clientWidth - 40;
+  const scale = (adWidth * previewScale > available)
+    ? previewScale * available / (adWidth * previewScale)
+    : previewScale;
+  frame.style.transform = `scale(${scale})`;
+  wrap.style.width  = Math.round(adWidth  * scale) + 'px';
+  wrap.style.height = Math.round(adHeight * scale) + 'px';
+}
+
+// Re-scale whenever the preview pane changes size
+const _previewPaneObserver = new ResizeObserver(applyPreviewScale);
+document.addEventListener('DOMContentLoaded', () => {
+  const pane = document.getElementById('previewPane');
+  if (pane) _previewPaneObserver.observe(pane);
+});
+
 function loadPreviewFrame() {
   const frame = document.getElementById('previewFrame');
   const wrap  = document.getElementById('previewWrap');
@@ -1073,14 +1622,52 @@ function loadPreviewFrame() {
   frame.style.width  = adWidth  + 'px';
   frame.style.height = adHeight + 'px';
   frame.style.transformOrigin = 'top left';
-  frame.style.transform = `scale(${previewScale})`;
-  wrap.style.width  = Math.round(adWidth  * previewScale) + 'px';
-  wrap.style.height = Math.round(adHeight * previewScale) + 'px';
 
-  frame.srcdoc = previewSrcdoc;
   frame.onload = () => {
     document.getElementById('previewLoading').style.display = 'none';
+    applyPreviewScale();
   };
+  frame.src = '/ad-preview/' + previewEntryPath + '?t=' + Date.now();
+  applyPreviewScale();
+}
+
+async function loadPreviewViaSW(zip, entryPath) {
+  previewEntryPath = entryPath;
+  const files = {};
+  const enc = new TextEncoder();
+
+  // Collect all files; inject click interceptor into entry HTML
+  const clickInterceptor = `<script>(function(){
+  window.open=function(url,t,f){try{parent.postMessage({type:'clickTag',url:url||''},'*');}catch(e){}return null;};
+  document.addEventListener('click',function(e){
+    var a=e.target&&e.target.closest?e.target.closest('a'):null;
+    if(!a)return;
+    var href=a.getAttribute('href')||'';
+    if(href.indexOf('javascript:')===0){e.preventDefault();try{(new Function(href.slice(11)))();}catch(ex){}}
+  },true);
+})();<\/script>`;
+
+  const fileData = {};
+  zip.forEach((path, entry) => { if (!entry.dir) fileData[path] = entry; });
+
+  for (const [path, entry] of Object.entries(fileData)) {
+    const bytes = await entry.async('uint8array');
+    let finalBytes = bytes;
+    if (path === entryPath) {
+      let html = new TextDecoder('utf-8', {fatal: false}).decode(bytes);
+      html = html.replace(/(<head[^>]*>)/i, '$1' + clickInterceptor) || clickInterceptor + html;
+      finalBytes = enc.encode(html);
+    }
+    files[path] = { bytes: finalBytes, mime: getMime(path) };
+  }
+
+  // Wait for SW to be ready, then send files
+  await navigator.serviceWorker.ready;
+  const sw = navigator.serviceWorker.controller || (await navigator.serviceWorker.ready).active;
+  sw.postMessage({ type: 'LOAD_FILES', files });
+
+  // Small delay to ensure SW processes the message before iframe load
+  await new Promise(r => setTimeout(r, 80));
 }
 
 // ─── Controls ────────────────────────────────────────────────────────────────
@@ -1150,19 +1737,221 @@ function openClickUrl() {
 }
 
 // ─── Landing page tab ─────────────────────────────────────────────────────────
-function populateLandingTab(clickTags) {
-  const el = document.getElementById('lpContent');
-  if (!clickTags || clickTags.length === 0) {
-    el.innerHTML = '<div class="lp-empty">No click tags detected in this creative.</div>';
+function lpClearError(textarea) {
+  textarea.classList.remove('error');
+  document.getElementById('lpUrlError').textContent = '';
+}
+
+const VALID_TLDS = new Set([
+  // Generic
+  'com','net','org','edu','gov','mil','int','biz','info','name','pro','aero',
+  'coop','museum','mobi','tel','jobs','travel','cat','post','xxx',
+  // Modern gTLDs
+  'app','dev','io','ai','co','tv','me','online','site','store','shop','blog',
+  'tech','media','news','agency','studio','design','cloud','digital','social',
+  'marketing','solutions','services','consulting','finance','health','care',
+  'global','world','group','network','systems','software','email','live',
+  // Country codes (common)
+  'us','uk','ca','au','de','fr','jp','cn','br','in','ru','mx','es','it','nl',
+  'se','no','dk','fi','ch','at','be','pl','pt','cz','hu','ro','tr','za','nz',
+  'sg','hk','kr','tw','th','my','id','ph','vn','ae','sa','il','eg','ng','ke',
+  'ar','cl','co','pe','ve','ec','uy','py',
+  // Common second-level + ccTLD combos treated as TLDs
+  'gov','edu',
+]);
+
+function validateUrl(url) {
+  if (!/^https?:\/\//i.test(url)) {
+    return "Please enter full URLs, including 'http://' or 'https://'";
+  }
+  // Extract the host portion (strip protocol, path, query, fragment)
+  const host = url.replace(/^https?:\/\//i, '').split(/[/?#]/)[0];
+  // "www" present but not followed by a dot
+  if (/\bwww[^.]/i.test(host)) {
+    return `Invalid URL "${url}": "www" must be followed by a period (e.g. www.example.com).`;
+  }
+  const parts = host.split('.');
+  // Need at least domain + TLD (2 parts); if www is present, need www + domain + TLD (3 parts)
+  const hasWww = /^www$/i.test(parts[0]);
+  const minParts = hasWww ? 3 : 2;
+  if (parts.length < minParts) {
+    return `Invalid URL "${url}": the domain is missing a period between the site name and its extension (e.g. .com, .net, .ai).`;
+  }
+  // The TLD (last part) must be a recognised extension
+  const tld = parts[parts.length - 1].toLowerCase();
+  if (!VALID_TLDS.has(tld)) {
+    return `Invalid URL "${url}": ".${tld}" is not a recognised domain extension. Did you mean .com, .net, or .org?`;
+  }
+  return null;
+}
+
+function checkLandingUrls() {
+  const textarea = document.getElementById('lpUrlInput');
+  const errorEl  = document.getElementById('lpUrlError');
+  const lines = textarea.value.split('\n').map(l => l.trim()).filter(Boolean);
+
+  if (!lines.length) {
+    textarea.classList.add('error');
+    errorEl.textContent = 'Please enter at least one URL.';
     return;
   }
-  el.innerHTML = clickTags.map(ct => `
-    <div class="lp-row">
-      <span class="lp-name">${esc(ct.name)}</span>
-      <span class="lp-url${ct.url ? '' : ' empty'}">${ct.url ? esc(ct.url) : 'No URL — will be set by ad server'}</span>
-      ${ct.url ? `<button class="text-btn" onclick="window.open(${JSON.stringify(ct.url)},'_blank','noopener')">Open</button>` : ''}
-    </div>`
-  ).join('');
+
+  for (const url of lines) {
+    const err = validateUrl(url);
+    if (err) {
+      textarea.classList.add('error');
+      errorEl.textContent = err;
+      return;
+    }
+  }
+
+  textarea.classList.remove('error');
+  errorEl.textContent = '';
+
+  const resultsEl = document.getElementById('lpResults');
+  resultsEl.innerHTML = '';
+
+  lines.forEach(url => {
+    const id = 'crawl-' + Math.random().toString(36).slice(2);
+    resultsEl.insertAdjacentHTML('beforeend', `
+      <div class="crawl-checking" id="${id}">
+        <div class="spin"></div>
+        <span>Checking crawlability of <strong>${esc(url)}</strong>…</span>
+      </div>`);
+
+    fetch(`https://html5-crawl-check.shoutoutdesigns.workers.dev/?url=${encodeURIComponent(url)}`)
+      .then(r => r.json())
+      .then(data => renderCrawlResult(id, url, data.ok && !data.redirected, data))
+      .catch(() => renderCrawlResult(id, url, false, null));
+  });
+}
+
+function lpCheckIcon(pass, warn) {
+  if (pass)
+    return `<svg class="icon-pass" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5l-4.5-4.5 1.41-1.41L10 13.67l7.09-7.09 1.41 1.41L10 16.5z"/></svg>`;
+  if (warn)
+    return `<svg class="icon-warn" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`;
+  return `<svg class="icon-fail" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`;
+}
+
+function lpCheckRow(pass, warn, label, detail) {
+  const uid = 'lpc-' + Math.random().toString(36).slice(2);
+  return `<div class="check-item" id="${uid}" onclick="document.getElementById('${uid}').classList.toggle('open')">
+    <div class="check-header">
+      ${lpCheckIcon(pass, warn)}
+      <span class="check-name">${label}</span>
+      <svg class="check-caret" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+    </div>
+    <div class="check-detail">${detail}</div>
+  </div>`;
+}
+
+function renderCrawlResult(id, url, success, data) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  const d = data || {};
+  const robots = d.robots || {};
+
+  // Individual checks
+  const httpsPass  = /^https:/i.test(url);
+  const reachPass  = d.status > 0;
+  const serverPass = d.status >= 200 && d.status < 300;
+  const noRedirect = !d.redirected;
+  const adsBotAllowed  = robots.adsBot ? robots.adsBot.allowed !== false : robots.adsBotAllowed !== false;
+  const adsBotExplicit = robots.adsBot ? robots.adsBot.explicit : false;
+  const googlebotAllowed  = robots.googlebot ? robots.googlebot.allowed !== false : robots.googlebotAllowed !== false;
+  const googlebotExplicit = robots.googlebot ? robots.googlebot.explicit : false;
+  const crawlable  = serverPass && noRedirect && adsBotAllowed && googlebotAllowed;
+
+  const checks = [
+    { pass: httpsPass,    warn: !httpsPass && /^http:/i.test(url),
+      label: 'Secure URL check',
+      detail: httpsPass
+        ? 'The URL uses HTTPS, which is required for Ad Manager.'
+        : 'The URL uses HTTP. Ad Manager requires HTTPS. Update the URL to use <code>https://</code>. <a href="https://web.dev/articles/why-https-matters" target="_blank" rel="noopener">Learn more</a>' },
+    { pass: reachPass,    warn: false,
+      label: 'DNS / server reachability',
+      detail: reachPass
+        ? 'The server is reachable and responded.'
+        : 'The URL could not be reached — the domain may not exist or the DNS server is down. Contact your DNS provider if the issue persists. <a href="https://support.google.com/webmasters/answer/2598813" target="_blank" rel="noopener">Learn more about DNS errors</a>' },
+    { pass: serverPass,   warn: false,
+      label: 'Server response check',
+      detail: serverPass
+        ? `Server returned HTTP ${d.status || 200} — OK.`
+        : `Server returned HTTP ${d.status || 0} (${esc(d.statusText || 'error')}). The page must return a 2xx response. <a href="https://support.google.com/webmasters/answer/2598813" target="_blank" rel="noopener">Learn more</a>` },
+    { pass: noRedirect,   warn: false,
+      label: 'Redirect check',
+      detail: noRedirect
+        ? 'No redirects detected. Ad servers require the URL to resolve directly.'
+        : `The URL redirects to <code>${esc(d.finalUrl || '')}</code>. Ad servers cannot follow redirects — use the final destination URL directly. <a href="https://developers.google.com/search/docs/crawling-indexing/site-move-with-url-changes" target="_blank" rel="noopener">Learn more about redirects</a>` },
+    { pass: adsBotAllowed && adsBotExplicit, warn: adsBotAllowed && !adsBotExplicit,
+      label: 'AdsBot-Google robots.txt check',
+      detail: !adsBotAllowed
+        ? 'robots.txt is blocking AdsBot-Google. Add <code>User-agent: AdsBot-Google</code> / <code>Allow: /</code> to your robots.txt. <a href="https://developers.google.com/search/docs/crawling-indexing/robots/robots_txt" target="_blank" rel="noopener">Learn more</a>'
+        : adsBotExplicit
+          ? 'robots.txt has an explicit <code>Allow</code> entry for AdsBot-Google.'
+          : 'AdsBot-Google is permitted via <code>User-agent: *</code>, but Google Ad Manager recommends adding an explicit entry: <code>User-agent: AdsBot-Google</code> / <code>Allow: /</code>. <a href="https://developers.google.com/search/docs/crawling-indexing/robots/intro" target="_blank" rel="noopener">Learn more about robots.txt</a>' },
+    { pass: googlebotAllowed && googlebotExplicit, warn: googlebotAllowed && !googlebotExplicit,
+      label: 'Googlebot robots.txt check',
+      detail: !googlebotAllowed
+        ? 'robots.txt is blocking Googlebot. Add <code>User-agent: Googlebot</code> / <code>Allow: /</code> to your robots.txt. <a href="https://developers.google.com/search/docs/crawling-indexing/robots/robots_txt" target="_blank" rel="noopener">Learn more</a>'
+        : googlebotExplicit
+          ? 'robots.txt has an explicit <code>Allow</code> entry for Googlebot.'
+          : 'Googlebot is permitted via <code>User-agent: *</code>, but Google Ad Manager recommends adding an explicit entry: <code>User-agent: Googlebot</code> / <code>Allow: /</code>. <a href="https://developers.google.com/search/docs/crawling-indexing/robots/intro" target="_blank" rel="noopener">Learn more about robots.txt</a>' },
+  ];
+
+  const failures = checks.filter(c => !c.pass && !c.warn).length;
+  const warnings = checks.filter(c => c.warn).length;
+  const summaryState = crawlable && warnings === 0 ? 'pass' : failures > 0 ? 'fail' : 'warn';
+  const summaryIcon = summaryState === 'fail'
+    ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`
+    : summaryState === 'warn'
+    ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`
+    : `<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`;
+  const summaryLabel = summaryState === 'fail' ? 'Crawlability check failure'
+    : summaryState === 'warn' ? 'Crawlability check success — with warnings'
+    : 'Crawlability check success';
+  const summaryIconColor = summaryState === 'fail' ? '#d32f2f' : summaryState === 'warn' ? '#f9ab00' : '#34a853';
+  const summaryColor = summaryState === 'fail' ? '#d32f2f' : summaryState === 'warn' ? '#b06000' : '#34a853';
+
+  el.outerHTML = `
+    <div class="crawl-result">
+      <div class="crawl-result-label">Landing Page: <span>${esc(url)}</span></div>
+      <div class="crawl-status" style="margin-bottom:8px">
+        <div class="crawl-icon" style="background:${summaryIconColor}">${summaryIcon}</div>
+        <span style="color:${summaryColor};font-weight:500">${summaryLabel}</span>
+      </div>
+      <p style="font-size:13px;color:#757575;margin:0 0 16px">
+        <a href="https://support.google.com/displayvideo/answer/7455777" target="_blank" rel="noopener">Troubleshoot uncrawlable landing pages</a> — Google Display &amp; Video 360 help
+      </p>
+      <div class="checks-outer" style="border:1px solid #e0e0e0;border-radius:2px">
+        ${checks.map(c => lpCheckRow(c.pass, c.warn, c.label, c.detail)).join('')}
+      </div>
+    </div>
+    <div class="crawl-footer">
+      <button class="crawl-share-btn" id="share-btn-${id}" onclick="shareCrawlLink(${JSON.stringify(url)}, '${id}')">Share</button>
+    </div>`;
+}
+
+// Auto-run check if ?url= query param is present (shared link)
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const sharedUrl = params.get('url');
+  if (sharedUrl) {
+    switchTab('landing');
+    document.getElementById('lpUrlInput').value = sharedUrl;
+    setTimeout(checkLandingUrls, 100);
+  }
+})();
+
+function populateLandingTab(clickTags) {
+  // Pre-fill the URL checker with click tag URLs from the uploaded asset
+  if (!clickTags || clickTags.length === 0) return;
+  const urls = clickTags.filter(ct => ct.url).map(ct => ct.url);
+  if (urls.length) {
+    document.getElementById('lpUrlInput').value = urls.join('\n');
+  }
 }
 
 // ─── Actions ─────────────────────────────────────────────────────────────────
@@ -1174,8 +1963,24 @@ function startOver() {
   document.getElementById('landingPage').style.display = 'none';
   document.getElementById('tabAsset').classList.add('active');
   document.getElementById('tabLanding').classList.remove('active');
-  document.getElementById('previewFrame').srcdoc = '';
+  document.getElementById('previewFrame').src = 'about:blank';
   document.getElementById('previewLoading').style.display = 'flex';
+}
+
+function shareCrawlLink(url, id) {
+  const shareUrl = new URL(window.location.href);
+  shareUrl.search = '';
+  shareUrl.searchParams.set('url', url);
+  const btn = document.getElementById('share-btn-' + id);
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(shareUrl.toString()).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = orig; }, 2000);
+    });
+  } else {
+    prompt('Copy this link:', shareUrl.toString());
+  }
 }
 
 function shareResults() {
