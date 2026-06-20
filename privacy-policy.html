@@ -522,5 +522,30 @@
   })();
 </script>
 
+<script>
+  (function () {
+    function fixCookiePolicyLinks(root) {
+      (root || document).querySelectorAll('a').forEach(function (a) {
+        if (/cookie[\s-]?policy/i.test(a.textContent) || /cookie[\s-]?policy/i.test(a.href)) {
+          a.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            window.location.href = '/cookie-policy.html';
+          }, true);
+        }
+      });
+    }
+    var observer = new MutationObserver(function (mutations) {
+      mutations.forEach(function (m) {
+        m.addedNodes.forEach(function (node) {
+          if (node.nodeType === 1) fixCookiePolicyLinks(node);
+        });
+      });
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+    document.addEventListener('DOMContentLoaded', function () { fixCookiePolicyLinks(); });
+  })();
+</script>
+
 </body>
 </html>
