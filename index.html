@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HTML5 Validator</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231a7340'/><polyline points='7,17 13,23 25,10' fill='none' stroke='%23ffffff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/></svg>">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5333418337408349"
        crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -39,6 +40,21 @@
     }
     @media (max-width: 1050px) {
       .ad-col { display: none; }
+    }
+
+    /* ── Inline ad slots ────────────────────────────────────────────────────── */
+    .inline-ad {
+      padding: 16px 24px;
+      border-top: 1px solid #e0e0e0;
+      background: #fafafa;
+    }
+    .inline-ad-pair {
+      display: flex;
+      gap: 16px;
+    }
+    .inline-ad-half {
+      flex: 1;
+      min-width: 0;
     }
 
     /* ── Header ────────────────────────────────────────────────────────────── */
@@ -685,10 +701,11 @@
 
 <div class="ad-col" id="ad-left">
   <ins class="adsbygoogle"
-       style="display:block;width:160px;height:600px"
+       style="display:block"
        data-ad-client="ca-pub-5333418337408349"
-       data-ad-slot="left"
-       data-ad-format="auto"></ins>
+       data-ad-slot="8273327987"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
   <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </div>
 
@@ -813,12 +830,45 @@
       <button class="text-btn" onclick="switchTab('landing')">Test</button>
     </div>
 
+    <!-- Ad: horizontal between preview and results -->
+    <div class="inline-ad">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-5333418337408349"
+           data-ad-slot="3192125766"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+
     <!-- Validation summary -->
     <div class="validation-summary" id="validationSummary" style="display:none"></div>
 
     <!-- Checks grid -->
     <div class="checks-outer">
       <div id="checksGrid"></div>
+    </div>
+
+    <!-- Ad: two squares side by side after checks -->
+    <div class="inline-ad inline-ad-pair">
+      <div class="inline-ad-half">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-5333418337408349"
+             data-ad-slot="8795806237"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+      <div class="inline-ad-half">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-5333418337408349"
+             data-ad-slot="6764805190"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
     </div>
 
     <!-- Actions -->
@@ -844,6 +894,17 @@
       </div>
       <div class="lp-url-error" id="lpUrlError"></div>
       <div id="lpResults"></div>
+
+      <!-- Ad: horizontal after landing page results -->
+      <div class="inline-ad" id="lpAdSlot" style="display:none">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-5333418337408349"
+             data-ad-slot="1108887907"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
     </div>
     <div class="lp-checker-footer">
       <button class="lp-check-btn" onclick="checkLandingUrls()">CHECK</button>
@@ -1856,6 +1917,7 @@ async function checkLandingUrls() {
 
   const resultsEl = document.getElementById('lpResults');
   resultsEl.innerHTML = '';
+  document.getElementById('lpAdSlot').style.display = 'block';
 
   lines.forEach(url => {
     const id = 'crawl-' + Math.random().toString(36).slice(2);
@@ -2073,10 +2135,11 @@ function getMime(path) {
 
 <div class="ad-col" id="ad-right">
   <ins class="adsbygoogle"
-       style="display:block;width:160px;height:600px"
+       style="display:block"
        data-ad-client="ca-pub-5333418337408349"
-       data-ad-slot="right"
-       data-ad-format="auto"></ins>
+       data-ad-slot="5347781742"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
   <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </div>
 
