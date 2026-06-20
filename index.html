@@ -17,6 +17,27 @@
       min-height: 100vh;
     }
 
+    /* ── Ad column layout ───────────────────────────────────────────────────── */
+    #page-layout {
+      display: flex;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .ad-col {
+      width: 160px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 56px; /* below the sticky header */
+      min-height: calc(100vh - 56px);
+    }
+    #main-col {
+      flex: 1;
+      min-width: 0;
+    }
+    @media (max-width: 1400px) {
+      .ad-col { display: none; }
+    }
+
     /* ── Header ────────────────────────────────────────────────────────────── */
     .header {
       background: #1a7340;
@@ -655,6 +676,20 @@
     </div>
   </div>
 </header>
+
+<!-- ── Three-column layout: ad | content | ad ── -->
+<div id="page-layout">
+
+<div class="ad-col" id="ad-left">
+  <ins class="adsbygoogle"
+       style="display:block;width:160px;height:600px"
+       data-ad-client="ca-pub-5333418337408349"
+       data-ad-slot="left"
+       data-ad-format="auto"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+
+<div id="main-col">
 
 <!-- ── Upload page ── -->
 <div id="uploadPage">
@@ -2024,5 +2059,19 @@ function getMime(path) {
   })[ext] || 'application/octet-stream';
 }
 </script>
+
+</div><!-- /main-col -->
+
+<div class="ad-col" id="ad-right">
+  <ins class="adsbygoogle"
+       style="display:block;width:160px;height:600px"
+       data-ad-client="ca-pub-5333418337408349"
+       data-ad-slot="right"
+       data-ad-format="auto"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+
+</div><!-- /page-layout -->
+
 </body>
 </html>
