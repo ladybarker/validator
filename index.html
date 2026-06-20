@@ -17,6 +17,30 @@
       min-height: 100vh;
     }
 
+    /* ── Ad column layout ───────────────────────────────────────────────────── */
+    #page-layout {
+      max-width: 1056px; /* 160 + 24 + 688 + 24 + 160 */
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      padding: 0 16px;
+    }
+    .ad-col {
+      width: 160px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 56px;
+      min-height: calc(100vh - 56px);
+    }
+    #main-col {
+      flex: 1;
+      min-width: 0;
+    }
+    @media (max-width: 1050px) {
+      .ad-col { display: none; }
+    }
+
     /* ── Header ────────────────────────────────────────────────────────────── */
     .header {
       background: #1a7340;
@@ -656,6 +680,20 @@
   </div>
 </header>
 
+<!-- ── Three-column layout: ad | content | ad ── -->
+<div id="page-layout">
+
+<div class="ad-col" id="ad-left">
+  <ins class="adsbygoogle"
+       style="display:block;width:160px;height:600px"
+       data-ad-client="ca-pub-5333418337408349"
+       data-ad-slot="left"
+       data-ad-format="auto"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+
+<div id="main-col">
+
 <!-- ── Upload page ── -->
 <div id="uploadPage">
   <div>
@@ -895,6 +933,9 @@ function onFileSelect(e) {
 // ─── Main entry ─────────────────────────────────────────────────────────────────
 async function processFile(file) {
   if (!/\.zip$/i.test(file.name)) { alert('Please select a .zip file.'); return; }
+
+  // 1-second pause so AdSense has enough visible time to count an impression
+  await new Promise(r => setTimeout(r, 1000));
 
   // Show asset page (loading state)
   document.getElementById('uploadPage').style.display  = 'none';
@@ -1787,7 +1828,7 @@ function validateUrl(url) {
   return null;
 }
 
-function checkLandingUrls() {
+async function checkLandingUrls() {
   const textarea = document.getElementById('lpUrlInput');
   const errorEl  = document.getElementById('lpUrlError');
   const lines = textarea.value.split('\n').map(l => l.trim()).filter(Boolean);
@@ -1809,6 +1850,9 @@ function checkLandingUrls() {
 
   textarea.classList.remove('error');
   errorEl.textContent = '';
+
+  // 1-second pause so AdSense has enough visible time to count an impression
+  await new Promise(r => setTimeout(r, 1000));
 
   const resultsEl = document.getElementById('lpResults');
   resultsEl.innerHTML = '';
@@ -2024,5 +2068,19 @@ function getMime(path) {
   })[ext] || 'application/octet-stream';
 }
 </script>
+
+</div><!-- /main-col -->
+
+<div class="ad-col" id="ad-right">
+  <ins class="adsbygoogle"
+       style="display:block;width:160px;height:600px"
+       data-ad-client="ca-pub-5333418337408349"
+       data-ad-slot="right"
+       data-ad-format="auto"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+
+</div><!-- /page-layout -->
+
 </body>
 </html>
