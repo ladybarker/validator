@@ -282,33 +282,22 @@
 <script>
   (function () {
     var style = document.createElement('style');
-    style.textContent = [
-      '[class*="poweredBy"]',
-      '[class*="powered-by"]',
-      '[class*="PoweredBy"]',
-      '[id*="poweredBy"]',
-      '[id*="powered-by"]',
-      'a[href*="termly.io"]',
-      '[class*="termly-branding"]',
-      '[class*="TermlyBranding"]',
-      '[class*="brandingLink"]',
-      '[class*="BrandingLink"]'
-    ].join(',') + ' { display: none !important; }';
+    style.textContent = '[class*="termly-styles-logo"] { display: none !important; }';
     document.head.appendChild(style);
 
     document.addEventListener('click', function (e) {
       var path = e.composedPath ? e.composedPath() : [];
       for (var i = 0; i < path.length; i++) {
         var el = path[i];
-        if (el.tagName === 'A') {
-          var text = el.textContent || '';
-          var href = el.getAttribute ? (el.getAttribute('href') || '') : '';
-          if (/cookie[\s-]?policy/i.test(text) || /cookie[\s-]?policy/i.test(href)) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            window.location.href = '/cookie-policy.html';
-            return;
-          }
+        if (!el.getAttribute) continue;
+        var testId = el.getAttribute('data-testid') || '';
+        var text = el.textContent || '';
+        var href = el.getAttribute('href') || '';
+        if (testId === 'cookie-policy-link' || /cookie[\s-]?policy/i.test(text) || /cookie[\s-]?policy/i.test(href)) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          window.location.href = '/cookie-policy.html';
+          return;
         }
       }
     }, true);
