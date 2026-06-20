@@ -281,6 +281,21 @@
 
 <script>
   (function () {
+    var style = document.createElement('style');
+    style.textContent = [
+      '[class*="poweredBy"]',
+      '[class*="powered-by"]',
+      '[class*="PoweredBy"]',
+      '[id*="poweredBy"]',
+      '[id*="powered-by"]',
+      'a[href*="termly.io"]',
+      '[class*="termly-branding"]',
+      '[class*="TermlyBranding"]',
+      '[class*="brandingLink"]',
+      '[class*="BrandingLink"]'
+    ].join(',') + ' { display: none !important; }';
+    document.head.appendChild(style);
+
     function fixCookiePolicyLinks(root) {
       (root || document).querySelectorAll('a').forEach(function (a) {
         if (/cookie[\s-]?policy/i.test(a.textContent) || /cookie[\s-]?policy/i.test(a.href)) {
