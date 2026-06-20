@@ -150,7 +150,7 @@
   <h1>COOKIE POLICY</h1>
   <p class="subtitle"><strong>Last updated June 20, 2026</strong></p>
 
-  <p>This Cookie Policy explains how <strong>Shitty Shirts, LLC</strong> (doing business as <strong>Ad Validator</strong>) (<strong>"Company," "we," "us,"</strong> and <strong>"our"</strong>) uses cookies and similar technologies to recognize you when you visit our website at <a href="http://html5advalidator.com" target="_blank">html5advalidator.com</a> (<strong>"Website"</strong>). It explains what these technologies are and why we use them, as well as your rights to control our use of them.</p>
+  <p>This Cookie Policy explains how <strong>Shitty Shirts, LLC</strong> (doing business as <strong>Ad Validator</strong>) (<strong>"Company," "we," "us,"</strong> and <strong>"our"</strong>) uses cookies and similar technologies to recognize you when you visit our website at <a href="#" class="dynamic-origin" data-path="" target="_blank"></a> (<strong>"Website"</strong>). It explains what these technologies are and why we use them, as well as your rights to control our use of them.</p>
 
   <p>In some cases we may use cookies to collect personal information, or that becomes personal information if we combine it with other information.</p>
 
@@ -266,6 +266,18 @@
   <a href="/cookie-policy.html" style="color:#9e9e9e; margin:0 8px;">Cookie Policy</a>
   <a href="#" class="termly-display-preferences" style="color:#9e9e9e; margin:0 8px;">Consent Preferences</a>
 </footer>
+
+<script>
+  (function () {
+    var origin = window.location.origin;
+    document.querySelectorAll('a.dynamic-origin').forEach(function (a) {
+      var path = a.getAttribute('data-path') || '';
+      var full = origin + path;
+      a.href = full;
+      if (!a.textContent.trim()) a.textContent = full;
+    });
+  })();
+</script>
 
 </body>
 </html>
