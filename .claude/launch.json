@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Static File Server (Python)",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["/Users/laurabarker/Documents/GitHub/validator/serve.py"],
+      "port": 8080,
+      "autoPort": true
+    }
+  ]
+}
