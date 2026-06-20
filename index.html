@@ -934,6 +934,9 @@ function onFileSelect(e) {
 async function processFile(file) {
   if (!/\.zip$/i.test(file.name)) { alert('Please select a .zip file.'); return; }
 
+  // 1-second pause so AdSense has enough visible time to count an impression
+  await new Promise(r => setTimeout(r, 1000));
+
   // Show asset page (loading state)
   document.getElementById('uploadPage').style.display  = 'none';
   document.getElementById('landingPage').style.display = 'none';
@@ -1825,7 +1828,7 @@ function validateUrl(url) {
   return null;
 }
 
-function checkLandingUrls() {
+async function checkLandingUrls() {
   const textarea = document.getElementById('lpUrlInput');
   const errorEl  = document.getElementById('lpUrlError');
   const lines = textarea.value.split('\n').map(l => l.trim()).filter(Boolean);
@@ -1847,6 +1850,9 @@ function checkLandingUrls() {
 
   textarea.classList.remove('error');
   errorEl.textContent = '';
+
+  // 1-second pause so AdSense has enough visible time to count an impression
+  await new Promise(r => setTimeout(r, 1000));
 
   const resultsEl = document.getElementById('lpResults');
   resultsEl.innerHTML = '';
