@@ -2164,10 +2164,7 @@ function getMime(path) {
       for (var i = 0; i < path.length; i++) {
         var el = path[i];
         if (!el.getAttribute) continue;
-        var testId = el.getAttribute('data-testid') || '';
-        var text = el.textContent || '';
-        var href = el.getAttribute('href') || '';
-        if (testId === 'cookie-policy-link' || /cookie[\s-]?policy/i.test(text) || /cookie[\s-]?policy/i.test(href)) {
+        if (el.getAttribute('data-testid') === 'cookie-policy-link') {
           e.preventDefault();
           e.stopImmediatePropagation();
           window.location.href = '/cookie-policy.html';
