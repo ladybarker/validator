@@ -296,26 +296,22 @@
     ].join(',') + ' { display: none !important; }';
     document.head.appendChild(style);
 
-    function fixCookiePolicyLinks(root) {
-      (root || document).querySelectorAll('a').forEach(function (a) {
-        if (/cookie[\s-]?policy/i.test(a.textContent) || /cookie[\s-]?policy/i.test(a.href)) {
-          a.addEventListener('click', function (e) {
+    document.addEventListener('click', function (e) {
+      var path = e.composedPath ? e.composedPath() : [];
+      for (var i = 0; i < path.length; i++) {
+        var el = path[i];
+        if (el.tagName === 'A') {
+          var text = el.textContent || '';
+          var href = el.getAttribute ? (el.getAttribute('href') || '') : '';
+          if (/cookie[\s-]?policy/i.test(text) || /cookie[\s-]?policy/i.test(href)) {
             e.preventDefault();
             e.stopImmediatePropagation();
             window.location.href = '/cookie-policy.html';
-          }, true);
+            return;
+          }
         }
-      });
-    }
-    var observer = new MutationObserver(function (mutations) {
-      mutations.forEach(function (m) {
-        m.addedNodes.forEach(function (node) {
-          if (node.nodeType === 1) fixCookiePolicyLinks(node);
-        });
-      });
-    });
-    observer.observe(document.documentElement, { childList: true, subtree: true });
-    document.addEventListener('DOMContentLoaded', function () { fixCookiePolicyLinks(); });
+      }
+    }, true);
   })();
 </script>
 
